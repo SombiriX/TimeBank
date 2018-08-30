@@ -14,8 +14,8 @@ import os
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-CLIENT_DIST_DIR = os.path.join(BASE_DIR, '..', 'timebank_frontend', 'dist')
-
+FRONTEND_DIR = os.path.join(BASE_DIR, '..', 'timebank_frontend')
+CLIENT_DIST_DIR = os.path.join(FRONTEND_DIR, 'dist')
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/2.1/howto/deployment/checklist/
@@ -41,13 +41,18 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'django.contrib.sites',
 
+    # REST Framework (API)
     'rest_framework',
     'rest_framework.authtoken',
     'rest_auth',
 
+    # REST Authentication
     'allauth',
     'allauth.account',
     'rest_auth.registration',
+
+    # Webpack Integration
+    'webpack_loader',
 ]
 
 MIDDLEWARE = [
@@ -114,7 +119,20 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 
-STATICFILES_DIRS = [os.path.join(CLIENT_DIST_DIR, '')]
+STATICFILES_DIRS = [CLIENT_DIST_DIR]
+
+STATIC_ROOT = os.path.join(FRONTEND_DIR, 'static')
+
+WEBPACK_LOADER = {
+    'DEFAULT': {
+        'CACHE': not DEBUG,
+        'BUNDLE_DIR_NAME': '',
+        'STATS_FILE': os.path.join(FRONTEND_DIR, 'webpack-stats.json'),
+        'POLL_INTERVAL': 0.1,
+        'TIMEOUT': None,
+        'IGNORE': ['.+\.hot-update.js', '.+\.map']
+    }
+}
 
 TEMPLATE_DIRS = [
     CLIENT_DIST_DIR,
