@@ -32,7 +32,10 @@ ALLOWED_HOSTS = ['192.168.254.73']
 # Application definition
 
 INSTALLED_APPS = [
+    # Timebank app
     'timebank_app.apps.TimebankAppConfig',
+
+    # Django apps
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -167,7 +170,7 @@ REST_FRAMEWORK = {
     )
 }
 
-# AUTH_USER_MODEL = 'api.User'
+AUTH_USER_MODEL = 'timebank_app.User'
 
 # SECURITY WARNING: don't use AlwaysRootBackend in production
 # AUTHENTICATION_BACKENDS = ['server.auth.AlwaysRootBackend']

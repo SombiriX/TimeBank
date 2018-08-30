@@ -1,3 +1,11 @@
 from django.contrib import admin
 
-# Register your models here.
+from .models import (
+    Interval,
+    Task,
+    User,
+)
+
+admin.site.register(Interval)
+admin.site.register(Task)
+admin.site.register(User)
