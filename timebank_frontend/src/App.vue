@@ -2,9 +2,11 @@
   <v-app dark>
     <v-content>
       <v-toolbar color="primary" dense>
-        <v-toolbar-title>
-          Time Bank
-        </v-toolbar-title>
+        <v-card to="/home" color="primary" flat>
+          <v-toolbar-title>
+            Time Bank
+          </v-toolbar-title>
+        </v-card>
         <v-spacer></v-spacer>
         <v-btn
           flat
@@ -47,11 +49,11 @@
 
 export default {
   name: 'App',
-  data() {
+  data () {
     return {
       fixed: false,
-      title: 'Time Bank',
-    };
-  },
-};
+      title: 'Time Bank'
+    }
+  }
+}
 </script>
