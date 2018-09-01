@@ -10,7 +10,10 @@
             <span class="headline">Create Account</span>
           </v-card-title>
           <v-container grid-list-xs>
-            <v-form @submit.prevent="submit">
+            <v-form
+              ref="registerForm"
+              @submit.prevent="submit()"
+            >
               <v-text-field
                 label="Email"
                 :rules="[rules.required]"
@@ -44,33 +47,42 @@
                 :append-icon="pwd_visibility ? 'visibility' : 'visibility_off'"
                 @click:append="() => (pwd_visibility = !pwd_visibility)"
                 value="Password"
-                :rules="[rules.required, rules.atLeast8]"
+                :rules="[rules.required, rules.atLeast8, rules.passMatch]"
                 :type="pwd_visibility ? 'text' : 'password'"
                 v-model="inputs.password2"
               >
               </v-text-field>
-              <v-btn @click="createAccount(inputs)">
-                create account
-              </v-btn>
-              <span class="error" v-show="registrationError">
-                An error occured while processing your request.
-              </span>
               <v-container grid-list-md text-xs-center>
-              <v-card-actions>
+                <v-layout row align-center justify-center>
+                  <v-btn flat type='submit'>create account</v-btn>
+                </v-layout>
                 <v-layout row>
-                  <v-flex xs6>
-                    Already have an account?
-                  </v-flex>
-                  <v-flex xs2>
-                    <router-link to="/login">login</router-link>
-                  </v-flex>
-                  <v-flex xs6>
-                    <router-link to="/password_reset">
-                      reset password
-                    </router-link>
+                  <v-flex xs14>
+                    <v-alert
+                    type="error"
+                    dismissible
+                    :value="registrationError"
+                    transition="fade-transition"
+                    >
+                     An error occured while processing your request.
+                    </v-alert>
                   </v-flex>
                 </v-layout>
-              </v-card-actions>
+                <v-layout row>
+                  <v-card-actions>
+                    <v-flex>
+                      Already have an account?
+                    </v-flex>
+                    <v-flex>
+                      <router-link to="/login">login</router-link>
+                    </v-flex>
+                    <v-flex>
+                      <router-link to="/password_reset">
+                        reset password
+                      </router-link>
+                    </v-flex>
+                  </v-card-actions>
+                </v-layout>
               </v-container>
             </v-form>
           </v-container>
@@ -104,7 +116,10 @@ export default {
       pwd_visibility: false,
       rules: {
         required: value => value.length > 0 || 'This field is required',
-        atLeast8: value => value.length >= 8 || 'At least 8 characters required'
+        atLeast8: value => value.length >= 8 || 'At least 8 characters required',
+        passMatch: value => (
+          value === this.inputs.password1 || 'Passwords do not match'
+        )
       }
     }
   },
@@ -113,10 +128,21 @@ export default {
     'registrationError',
     'registrationLoading'
   ]),
-  methods: mapActions('signup', [
-    'createAccount',
-    'clearRegistrationStatus'
-  ]),
+  methods: Object.assign({},
+    mapActions('signup', [
+      'createAccount',
+      'clearRegistrationStatus'
+    ]),
+    {
+      submit: function () {
+        // Validate inputs and login
+        if (this.$refs.registerForm.validate()) {
+          var inputs = this.inputs
+          this.createAccount(inputs)
+        }
+      }
+    }
+  ),
   beforeRouteLeave: function (to, from, next) {
     this.clearRegistrationStatus()
     next()
