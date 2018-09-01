@@ -2,9 +2,16 @@ import Vue from 'vue'
 import Router from 'vue-router'
 import Home from './views/Home.vue'
 
+import store from './store'
+
 Vue.use(Router)
 
-export const router = new Router({
+const redirectLogout = (to, from, next) => {
+  store.dispatch('auth/logout')
+    .then(() => next('/login'))
+}
+
+const router = new Router({
   mode: 'history',
   routes: [
     {
@@ -21,6 +28,11 @@ export const router = new Router({
       path: '/login',
       name: 'login',
       component: () => import('./views/Login.vue')
+    },
+    {
+      path: '/logout',
+      name: 'logout',
+      beforeEnter: redirectLogout
     },
     {
       path: '/register',
@@ -41,7 +53,7 @@ export const router = new Router({
 
 router.beforeEach((to, from, next) => {
   // Send user to login if not already signed in
-  const publicPages = ['/login', '/register', '/', '/about']
+  const publicPages = ['/login', '/register', '/', '/about', '/logout']
   const authRequired = !publicPages.includes(to.path)
   const loggedIn = localStorage.getItem('user')
 
