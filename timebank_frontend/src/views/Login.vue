@@ -5,7 +5,10 @@
         ref="loginForm"
         @submit.prevent="submit()"
       >
-        <v-card round>
+        <v-card>
+          <v-card-title>
+            <span class="headline">Login</span>
+          </v-card-title>
           <v-container grid-list-xs>
             <v-text-field
               label="Username"
@@ -55,7 +58,7 @@ export default {
       pwd_visibility: false,
       rules: {
         required: value => value.length > 0 || 'This field is required',
-        atLeast8: value => value.length >= 8 || 'At least 8 chracters required'
+        atLeast8: value => value.length >= 8 || 'At least 8 characters required'
       }
     }
   },
