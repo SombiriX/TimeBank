@@ -13,6 +13,7 @@
   },
   "dependencies": {
     "axios": "^0.18.0",
+    "babel-plugin-transform-object-rest-spread": "^6.26.0",
     "config": "^2.0.1",
     "vue": "^2.5.17",
     "vue-router": "^3.0.1",
