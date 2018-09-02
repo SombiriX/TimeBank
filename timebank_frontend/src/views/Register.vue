@@ -116,7 +116,9 @@ export default {
       pwd_visibility: false,
       rules: {
         required: value => value.length > 0 || 'This field is required',
-        atLeast8: value => value.length >= 8 || 'At least 8 characters required',
+        atLeast8: value => (
+          value.length >= 8 || 'At least 8 characters required'
+        ),
         passMatch: value => (
           value === this.inputs.password1 || 'Passwords do not match'
         )

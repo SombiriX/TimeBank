@@ -1,9 +1,9 @@
 from django.urls import path
 from .routers import router
-from . import views
+from .views import appView
 
 urlpatterns = [
-    path('', views.index, name='index'),
+    path('', appView.as_view(), name='index'),
 ]
 
 urlpatterns += router.urls
