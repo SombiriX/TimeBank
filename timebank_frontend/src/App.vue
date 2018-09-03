@@ -17,6 +17,7 @@
         <v-btn v-if="!isAuthenticated" flat to="/register">Sign Up</v-btn>
         <v-btn v-if="isAuthenticated" flat to="/logout">Logout</v-btn>
         <v-btn v-else flat to="/login">Login</v-btn>
+        <v-btn v-if="isAuthenticated" flat to="/timebank">Goto Time Bank</v-btn>
       </v-toolbar>
       <router-view/>
     </v-content>

@@ -55,12 +55,17 @@ router.beforeEach((to, from, next) => {
   // Send user to login if not already signed in
   const publicPages = ['/login', '/register', '/', '/about', '/logout']
   const authRequired = !publicPages.includes(to.path)
-  const loggedIn = localStorage.getItem('user')
 
-  if (authRequired && !loggedIn) {
-    return next('/login')
-  }
-
+  // Check authenticated status
+  store.dispatch('auth/initialize')
+    .then(() => {
+      const loggedIn = store.getters['auth/isAuthenticated']
+      if (authRequired && !loggedIn) {
+        return next('/login')
+      } else if (to.path === '/login' && loggedIn) {
+        return next('/')
+      }
+    })
   next()
 })
 
