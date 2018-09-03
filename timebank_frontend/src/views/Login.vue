@@ -32,14 +32,20 @@
           </v-container>
           <v-card-actions>
             <v-spacer></v-spacer>
-            <v-btn to="/register">create account</v-btn>
-            <v-btn to="/password_reset">reset password</v-btn>
-            <v-btn
-              id="login-button"
-              type="submit"
-            >
-              login
-            </v-btn>
+            <v-container grid-list-md text-xs-center>
+              <v-layout row>
+                <v-flex>
+                  <v-btn to="/register">create account</v-btn>
+                  <v-btn to="/password_reset">reset password</v-btn>
+                  <v-btn
+                    id="login-button"
+                    type="submit"
+                  >
+                    login
+                  </v-btn>
+                </v-flex>
+              </v-layout>
+            </v-container>
           </v-card-actions>
         </v-card>
       </v-form>

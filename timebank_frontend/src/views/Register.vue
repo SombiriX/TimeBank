@@ -1,111 +1,103 @@
 <template>
   <div id="register-view">
-    <template v-if="registrationLoading">
-      loading...
-    </template>
-    <template v-else-if="!registrationCompleted">
-      <v-layout row justify-center>
-        <v-card>
-          <v-card-title>
-            <span class="headline">Create Account</span>
-          </v-card-title>
-          <v-container grid-list-xs>
-            <v-form
-              ref="registerForm"
-              @submit.prevent="submit()"
+    <v-layout row justify-center>
+      <v-card>
+        <v-card-title>
+          <span class="headline">Create Account</span>
+        </v-card-title>
+        <v-container grid-list-xs>
+          <v-form
+            ref="registerForm"
+            @submit.prevent="submit()"
+          >
+            <v-text-field
+              label="Email"
+              required
+              v-model="inputs.email"
+              @input="$v.inputs.email.$touch()"
+              @blur="$v.inputs.email.$touch()"
+              :error-messages="emailErrors"
             >
-              <v-text-field
-                label="Email"
-                required
-                v-model="inputs.email"
-                @input="$v.inputs.email.$touch()"
-                @blur="$v.inputs.email.$touch()"
-                :error-messages="emailErrors"
-              >
-              </v-text-field>
-              <v-text-field
-                label="Username"
-                required
-                v-model="inputs.username"
-                @input="$v.inputs.username.$touch()"
-                @blur="$v.inputs.username.$touch()"
-                :error-messages="usernameErrors"
-              >
-              </v-text-field>
-              <v-text-field
-                name="name"
-                label="Password"
-                min="8"
-                :append-icon="pwd_visibility ? 'visibility' : 'visibility_off'"
-                @click:append="() => (pwd_visibility = !pwd_visibility)"
-                value="Password"
-                :type="pwd_visibility ? 'text' : 'password'"
-                v-model="inputs.password1"
-                @input="$v.inputs.password1.$touch()"
-                @blur="$v.inputs.password1.$touch()"
-                :error-messages="pass1Errors"
-              >
-              </v-text-field>
-              <v-text-field
-                name="name"
-                label="Confirm Password"
-                min="8"
-                :append-icon="pwd_visibility ? 'visibility' : 'visibility_off'"
-                @click:append="() => (pwd_visibility = !pwd_visibility)"
-                value="Password"
-                :type="pwd_visibility ? 'text' : 'password'"
-                v-model="inputs.password2"
-                @input="$v.inputs.password2.$touch()"
-                @blur="$v.inputs.password2.$touch()"
-                :error-messages="pass2Errors"
-              >
-              </v-text-field>
-              <v-container grid-list-md text-xs-center>
-                <v-layout row align-center justify-center>
-                  <v-btn flat type='submit'>create account</v-btn>
-                </v-layout>
-                <v-layout row>
-                  <v-flex xs14>
-                    <v-alert
-                    type="error"
-                    dismissible
-                    :value="registrationError"
-                    transition="fade-transition"
-                    >
-                     An error occured while processing your request.
-                    </v-alert>
+            </v-text-field>
+            <v-text-field
+              label="Username"
+              required
+              v-model="inputs.username"
+              @input="$v.inputs.username.$touch()"
+              @blur="$v.inputs.username.$touch()"
+              :error-messages="usernameErrors"
+            >
+            </v-text-field>
+            <v-text-field
+              name="name"
+              label="Password"
+              min="8"
+              :append-icon="pwd_visibility ? 'visibility' : 'visibility_off'"
+              @click:append="() => (pwd_visibility = !pwd_visibility)"
+              value="Password"
+              :type="pwd_visibility ? 'text' : 'password'"
+              v-model="inputs.password1"
+              @input="$v.inputs.password1.$touch()"
+              @blur="$v.inputs.password1.$touch()"
+              :error-messages="pass1Errors"
+            >
+            </v-text-field>
+            <v-text-field
+              name="name"
+              label="Confirm Password"
+              min="8"
+              :append-icon="pwd_visibility ? 'visibility' : 'visibility_off'"
+              @click:append="() => (pwd_visibility = !pwd_visibility)"
+              value="Password"
+              :type="pwd_visibility ? 'text' : 'password'"
+              v-model="inputs.password2"
+              @input="$v.inputs.password2.$touch()"
+              @blur="$v.inputs.password2.$touch()"
+              :error-messages="pass2Errors"
+            >
+            </v-text-field>
+            <v-container grid-list-md text-xs-center>
+              <v-layout row align-center justify-center>
+                <v-btn flat type='submit'>create account</v-btn>
+              </v-layout>
+              <v-layout row>
+                <v-flex xs4>
+                </v-flex>
+              </v-layout>
+              <v-layout row>
+                <v-card-actions>
+                  <v-flex>
+                    Already have an account?
                   </v-flex>
-                </v-layout>
-                <v-layout row>
-                  <v-card-actions>
-                    <v-flex>
-                      Already have an account?
-                    </v-flex>
-                    <v-flex>
-                      <router-link to="/login">login</router-link>
-                    </v-flex>
-                    <v-flex>
-                      <router-link to="/password_reset">
-                        reset password
-                      </router-link>
-                    </v-flex>
-                  </v-card-actions>
-                </v-layout>
-              </v-container>
-            </v-form>
-          </v-container>
-        </v-card>
-      </v-layout>
-    </template>
-    <template v-else>
-      <div>
-        Registration complete. You should receive an email shortly with
-        instructions on how to activate your account.
-      </div>
-      <div>
-        <v-btn to="/login">return to login page</v-btn>
-      </div>
-    </template>
+                  <v-flex>
+                    <router-link to="/login">login</router-link>
+                  </v-flex>
+                  <v-flex>
+                    <router-link to="/password_reset">
+                      reset password
+                    </router-link>
+                  </v-flex>
+                </v-card-actions>
+              </v-layout>
+            </v-container>
+          </v-form>
+        </v-container>
+      </v-card>
+    </v-layout>
+    <v-snackbar
+    :color="alert.type"
+    v-model="alert.status"
+    multi-line
+    top
+    >
+     {{ alert.message }}
+      <v-btn
+        flat
+        @click="alert.status = false"
+      >
+        Close
+      </v-btn>
+    </v-snackbar>
   </div>
 </template>
 
@@ -125,15 +117,45 @@ export default {
         password2: '',
         email: ''
       },
-      pwd_visibility: false
+      pwd_visibility: false,
+      alert: {
+        status: false,
+        message: '',
+        type: 'info'
+      }
     }
   },
   validations: {
     inputs: {
       username: { required, maxLength: maxLength(100) },
       password1: { required, minLength: minLength(8) },
-      password2: { required, minLength: minLength(8)},
+      password2: { required, minLength: minLength(8) },
       email: { required, email }
+    }
+  },
+  watch: {
+    registrationCompleted (val) {
+      if (val) {
+        this.alert.status = true
+        this.alert.message = (
+          'Registration complete. You should receive an email shortly with\n' +
+          'instructions on how to activate your account.'
+        )
+        this.alert.type = 'success'
+      } else {
+        this.alert.status = false
+        this.alert.message = ''
+      }
+    },
+    registrationError (val) {
+      if (val) {
+        this.alert.status = true
+        this.alert.message = 'An error occurred while processing your request.'
+        this.alert.type = 'error'
+      } else {
+        this.alert.status = false
+        this.alert.message = ''
+      }
     }
   },
   computed: Object.assign({},
@@ -180,6 +202,13 @@ export default {
         !(confirmPass === otherPass) && errors.push(
           'Passwords do not match')
         return errors
+      },
+      alertStatus () {
+        if (this.registrationCompleted || this.registrationError) {
+          return true
+        } else {
+          return false
+        }
       }
     }
   ),
