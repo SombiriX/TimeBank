@@ -192,8 +192,8 @@ export default {
       submit: function () {
         // Validate inputs and login
         this.$v.$touch()
-        if (this.$refs.registerForm.validate()) {
-          var inputs = this.inputs
+        if (!this.$v.$invalid) {
+          let inputs = this.inputs
           this.createAccount(inputs)
         }
       }
