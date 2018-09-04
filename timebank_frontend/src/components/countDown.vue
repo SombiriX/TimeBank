@@ -1,0 +1,90 @@
+<template>
+  <v-container>
+    <v-layout column align-center justify-center>
+      <v-flex class="countdown">
+        <span class="display-4">
+          {{ timeLeft }}
+        </span>
+      </v-flex>
+      <v-flex><span class="display-1">{{ endTime }}</span></v-flex>
+    </v-layout>
+  </v-container>
+</template>
+
+<script>
+var intervalTimer
+
+export default {
+  props: ['time', 'running'],
+  data: () => ({
+    selectedTime: 0,
+    timeLeft: '00:00',
+    endTime: '0',
+    dummy24Hr: false, // Dummy variable for user 24hr clock pref
+  }),
+  methods: {
+    startCountDown: function (seconds) {
+      // Set the countdown time and clear any running timers
+      clearInterval(intervalTimer)
+      this._timer(seconds)
+    },
+    _timer: function (seconds) {
+      // Determine end time and run the countdown to it
+      const now = Date.now()
+      const end = now + seconds * 1000
+      this.displayTimeLeft(seconds)
+
+      this.selectedTime = seconds
+      this.displayEndTime(end)
+      this._countdown(end)
+    },
+    _countdown: function (end) {
+      intervalTimer = setInterval(() => {
+        const secondsLeft = Math.round((end - Date.now()) / 1000)
+
+        if (secondsLeft === 0) {
+          this.endTime = 0
+        }
+
+        if (secondsLeft < 0) {
+          clearInterval(intervalTimer)
+          return
+        }
+        this.displayTimeLeft(secondsLeft)
+      }, 1000)
+    },
+    displayTimeLeft: function (secondsLeft) {
+      const minutes = Math.floor((secondsLeft % 3600) / 60)
+      const seconds = secondsLeft % 60
+
+      this.timeLeft = `${zeroPadded(minutes)}:${zeroPadded(seconds)}`
+    },
+    displayEndTime: function (timestamp) {
+      const end = new Date(timestamp)
+      const hour = end.getHours()
+      const minutes = end.getMinutes()
+
+      let amPm = (hour < 12) ? 'AM' : 'PM'
+      amPm = (this.dummy24Hr) ? '' : ' ' + amPm
+
+      this.endTime = (
+        `${hourConvert(hour, this.dummy24Hr)}:${zeroPadded(minutes)}` + amPm
+      )
+    }
+  }
+}
+
+function zeroPadded (num) {
+  // Pad numbers with 0 if less than 10
+  return num < 10 ? `0${num}` : num
+}
+
+function hourConvert (hour, display24HourClock) {
+  // Display hour for 12 or 24 hour clock settings
+  if (display24HourClock) {
+    return hour
+  } else {
+    return (hour % 12) || 12
+  }
+}
+</script>
