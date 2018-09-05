@@ -20,7 +20,7 @@ export default {
     selectedTime: 0,
     timeLeft: '00:00',
     endTime: '0',
-    dummy24Hr: false, // Dummy variable for user 24hr clock pref
+    dummy24Hr: false // Dummy variable for user 24hr clock pref
   }),
   methods: {
     startCountDown: function (seconds) {

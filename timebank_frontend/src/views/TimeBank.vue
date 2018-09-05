@@ -97,7 +97,7 @@
 </template>
 
 <script>
-import countdown from '../components/countDown'
+import countdown from '../components/CountDown'
 
 export default {
   data: () => ({
