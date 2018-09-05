@@ -15,13 +15,19 @@
 var intervalTimer
 
 export default {
-  props: ['time', 'running'],
-  data: () => ({
-    selectedTime: 0,
-    timeLeft: '00:00',
-    endTime: '0',
-    dummy24Hr: false // Dummy variable for user 24hr clock pref
-  }),
+  props: {
+    twentyFourClock: Boolean,
+    time: Number,
+    running: Boolean
+  },
+  data: function () {
+    return {
+      selectedTime: 0,
+      timeLeft: '00:00',
+      endTime: '0',
+      dummy24Hr: this.twentyFourClock
+    }
+  },
   methods: {
     startCountDown: function (seconds) {
       // Set the countdown time and clear any running timers
@@ -79,9 +85,9 @@ function zeroPadded (num) {
   return num < 10 ? `0${num}` : num
 }
 
-function hourConvert (hour, display24HourClock) {
+function hourConvert (hour, twentyFourClock) {
   // Display hour for 12 or 24 hour clock settings
-  if (display24HourClock) {
+  if (twentyFourClock) {
     return hour
   } else {
     return (hour % 12) || 12
