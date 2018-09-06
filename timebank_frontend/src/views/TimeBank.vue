@@ -1,5 +1,5 @@
 <template>
-  <v-container>
+  <v-container grid-list-md text-xs-center>
   <countdown v-bind:twentyFourClock=false></countdown>
     <v-form
       ref="createTask"
@@ -19,14 +19,16 @@
         </v-flex>
         <v-flex xs2>
           <v-text-field
+            v-model="newTask.duration"
             name="name"
             label="Duration"
             outline
             placeholder="HH:MM"
-            mask="##:##"
+            mask="time"
+            return-masked-value
             append-icon="timer"
             @keydown.enter="create"
-            :rules="[rules.required]"
+            :rules="[rules.required, rules.notZero]"
           ></v-text-field>
         </v-flex>
         <v-fade-transition slot="append">
@@ -66,13 +68,19 @@
         group
         tag="v-list"
       >
-        <template v-for="(task, i) in tasks">
+        <template
+          v-for="(task, i) in tasks"
+        >
           <v-divider
             v-if="i !== 0"
             :key="`${i}-divider`"
           ></v-divider>
 
-          <v-list-tile :key="`${i}-${task.text}`">
+          <v-list-tile
+            :key="`${i}-${task.text}`"
+            @mouseover="task.active = true"
+            @mouseleave="task.active = false"
+          >
             <v-list-tile-action>
               <v-checkbox
                 v-model="task.done"
@@ -88,23 +96,23 @@
             </v-list-tile-action>
 
             <v-spacer></v-spacer>
-            <v-divider inset vertical></v-divider>
-            {{ task.duration }}
-            <v-divider inset vertical></v-divider>
-            <v-btn flat icon >
-              <v-icon>play_arrow</v-icon>
-            </v-btn>
-            <v-btn flat icon >
-              <v-icon>pause</v-icon>
-            </v-btn>
-            <v-divider inset vertical></v-divider>
-            <v-btn flat icon >
-              <v-icon>info_outline</v-icon>
-            </v-btn>
-            <v-divider inset vertical></v-divider>
-            <v-btn flat icon @click="remove(task.id)">
-              <v-icon>remove_circle_outline</v-icon>
-            </v-btn>
+            <v-divider class="mx-2" inset vertical></v-divider>
+              {{ task.duration }}
+            <v-divider class="mx-2" inset vertical></v-divider>
+            <div  v-if="task.active">
+              <v-btn flat icon >
+                <v-icon>play_arrow</v-icon>
+              </v-btn>
+              <v-btn flat icon >
+                <v-icon>pause</v-icon>
+              </v-btn>
+              <v-btn flat icon >
+                <v-icon>info_outline</v-icon>
+              </v-btn>
+              <v-btn flat icon @click="remove(task.id)">
+                <v-icon>remove_circle_outline</v-icon>
+              </v-btn>
+            </div>
           </v-list-tile>
         </template>
       </v-slide-y-transition>
@@ -122,23 +130,32 @@ export default {
         id: 1,
         done: false,
         text: 'Foobar',
-        duration: "1:33"
+        duration: '01:33',
+        active: false
       },
       {
         id: 2,
         done: false,
         text: 'Fizzbuzz',
-        duration: "1:33"
+        duration: '01:33',
+        active: false
       }
     ],
     rules: {
-      required: value => !!value || 'Required.'
-
+      required: value => !!value || 'Required.',
+      notZero: function (value) {
+        const entry = convertTimeString(value)
+        const hasHours = entry.hours > 0
+        const hasMinutes = entry.minutes > 0
+        const error = 'Time must be greater than zero'
+        return (hasHours || hasMinutes) || error
+      }
     },
     newTask: {
       name: null,
-      duration: 0
-    }
+      duration: ''
+    },
+    taskValid: false
   }),
   components: { countdown },
   computed: {
@@ -158,18 +175,31 @@ export default {
       if (this.$refs.createTask.validate()) {
         this.tasks.push({
           done: false,
-          text: this.newTask.name
+          text: this.newTask.name,
+          duration: this.newTask.duration,
+          active: false
         })
         this.$refs.createTask.reset()
       }
     },
     remove: function (id) {
       this.tasks = this.tasks.filter(function (task) {
-        if (task.id != id) {
+        if (task.id !== id) {
           return task
         }
       })
     }
+  }
+}
+function convertTimeString(timeStr) {
+  // Split string into hours and minutes
+  const components = timeStr.split(':')
+  const hours = parseInt(components[0], 10)
+  const minutes = parseInt(components[1], 10)
+
+  return {
+    'hours': hours,
+    'minutes': minutes
   }
 }
 </script>
