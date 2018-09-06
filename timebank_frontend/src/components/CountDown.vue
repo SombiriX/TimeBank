@@ -28,6 +28,19 @@ export default {
       dummy24Hr: this.twentyFourClock
     }
   },
+  watch: {
+    running: function (value) {
+      // Start / stop the timer
+      if (value) {
+        // Start
+        this.startCountDown(this.time)
+      } else {
+        // Stop
+        this.startCountDown(0)
+        this.endTime = '0'
+      }
+    }
+  },
   methods: {
     startCountDown: function (seconds) {
       // Set the countdown time and clear any running timers

@@ -1,6 +1,10 @@
 <template>
   <v-container grid-list-md text-xs-center>
-  <countdown v-bind:twentyFourClock=false></countdown>
+  <countdown
+    v-bind:twentyFourClock = countdown.twentyFourClock
+    v-bind:time = countdown.time
+    v-bind:running = countdown.running
+  ></countdown>
     <v-form
       ref="createTask"
       v-model="taskValid"
@@ -100,10 +104,10 @@
               {{ task.duration }}
             <v-divider class="mx-2" inset vertical></v-divider>
             <div  v-if="task.active">
-              <v-btn flat icon >
+              <v-btn flat icon @click="start(task)">
                 <v-icon>play_arrow</v-icon>
               </v-btn>
-              <v-btn flat icon >
+              <v-btn flat icon @click="pause(task)">
                 <v-icon>pause</v-icon>
               </v-btn>
               <v-btn flat icon >
@@ -155,7 +159,12 @@ export default {
       name: null,
       duration: ''
     },
-    taskValid: false
+    taskValid: false,
+    countdown: {
+      twentyFourClock: false,
+      time: 0,
+      running: false
+    }
   }),
   components: { countdown },
   computed: {
@@ -188,10 +197,18 @@ export default {
           return task
         }
       })
+    },
+    start: function (task) {
+      this.countdown.running = false
+      this.countdown.time = toSeconds(task.duration)
+      this.countdown.running = true
+    },
+    pause: function (task) {
+      this.countdown.running = false
     }
   }
 }
-function convertTimeString(timeStr) {
+function convertTimeString (timeStr) {
   // Split string into hours and minutes
   const components = timeStr.split(':')
   const hours = parseInt(components[0], 10)
@@ -201,5 +218,16 @@ function convertTimeString(timeStr) {
     'hours': hours,
     'minutes': minutes
   }
+}
+
+function toSeconds (timeStr) {
+  // Convert time string to seconds
+  const time = convertTimeString(timeStr)
+  let seconds = 0
+
+  seconds += 60 * 60 * time.hours
+  seconds += 60 * time.minutes
+
+  return seconds
 }
 </script>
