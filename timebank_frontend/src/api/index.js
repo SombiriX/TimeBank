@@ -32,5 +32,41 @@ export default {
   verifyAccountEmail (key) {
     return session.post('/registration/verify-email/', { key })
   },
+  getTasks () {
+    return session.get('/task/')
+  },
+  getTask (id) {
+    return session.get(`/task/${id}/`)
+  },
+  addTask (task) {
+    return session.post('/task/', task)
+  },
+  updateTask (task, id) {
+    return session.put(`/task/${id}/`, task)
+  },
+  deleteTask (id) {
+    return session.delete(`/task/${id}/`)
+  },
+  getIntervals () {
+    return session.get('/interval/')
+  },
+  getInterval (id) {
+    return session.get(`/interval/${id}/`)
+  },
+  addInterval (interval) {
+    return session.post('/interval/', interval)
+  },
+  updateInterval (interval, id) {
+    return session.put(`/interval/${id}/`, interval)
+  },
+  deleteInterval (id) {
+    return session.delete(`/interval/${id}/`)
+  },
+  getUser () {
+    return session.get('/user/')
+  },
+  updateUser (user) {
+    return session.put(`/user/`, user)
+  },
   session
 }

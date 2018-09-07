@@ -4,10 +4,12 @@ from .viewsets import (
     IntervalViewSet,
     TaskViewSet,
     UserViewSet,
+    CurrentUserViewSet,
 )
 
 router = DefaultRouter()
 
-router.register(r'Interval', IntervalViewSet)
-router.register(r'Task', TaskViewSet)
-router.register(r'User', UserViewSet)
+router.register(r'interval', IntervalViewSet)
+router.register(r'task', TaskViewSet)
+router.register(r'users_api', UserViewSet)
+router.register(r'user', CurrentUserViewSet)

@@ -1,5 +1,5 @@
-from rest_framework.decorators import detail_route, action
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.decorators import action
+from rest_framework.permissions import IsAdminUser, IsAuthenticated
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.response import Response
 
@@ -20,13 +20,28 @@ from .serializers import (
 )
 
 
-class UserViewSet(ModelViewSet):
+class CurrentUserViewSet(ModelViewSet):
 
     queryset = User.objects.all()
     serializer_class = UserSerializer
 
     permission_classes = (
         IsAuthenticated,
+    )
+
+    @action(methods=['get'], detail=True)
+    def intervals(self, request, pk=None):
+        serializer = UserSerializer(request.user)
+        return Response(serializer.data)
+
+
+class UserViewSet(ModelViewSet):
+
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+
+    permission_classes = (
+        IsAdminUser,
     )
 
     @action(methods=['get'], detail=True)

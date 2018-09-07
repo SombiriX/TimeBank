@@ -11,6 +11,11 @@ const redirectLogout = (to, from, next) => {
     .then(() => next('/login'))
 }
 
+const initializeTimeBank = (to, from, next) => {
+  store.dispatch('task/initialize')
+    .then(() => next())
+}
+
 const router = new Router({
   mode: 'history',
   routes: [
@@ -42,7 +47,8 @@ const router = new Router({
     {
       path: '/timebank',
       name: 'timebank',
-      component: () => import('./views/TimeBank.vue')
+      component: () => import('./views/TimeBank.vue'),
+      beforeEnter: initializeTimeBank
     },
     {
       path: '*',
@@ -60,10 +66,18 @@ router.beforeEach((to, from, next) => {
   store.dispatch('auth/initialize')
     .then(() => {
       const loggedIn = store.getters['auth/isAuthenticated']
+      const hasUserInfo = store.getters['user/hasInfo']
+
       if (authRequired && !loggedIn) {
         return next('/login')
       } else if (to.path === '/login' && loggedIn) {
         return next('/')
+      } else {
+        // Get user info if it's not already loaded
+        if (!hasUserInfo) {
+          store.dispatch('user/initialize')
+          return next()
+        }
       }
     })
   next()

@@ -5,6 +5,8 @@ import Vuex from 'vuex'
 import auth from './auth'
 import password from './password'
 import signup from './signup'
+import task from './task'
+import user from './user'
 
 Vue.use(Vuex)
 
@@ -14,7 +16,9 @@ export default new Vuex.Store({
   modules: {
     auth,
     password,
-    signup
+    signup,
+    task,
+    user
   },
   strict: debug
 })
