@@ -20,21 +20,6 @@ from .serializers import (
 )
 
 
-class CurrentUserViewSet(ModelViewSet):
-
-    queryset = User.objects.all()
-    serializer_class = UserSerializer
-
-    permission_classes = (
-        IsAuthenticated,
-    )
-
-    @action(methods=['get'], detail=True)
-    def intervals(self, request, pk=None):
-        serializer = UserSerializer(request.user)
-        return Response(serializer.data)
-
-
 class UserViewSet(ModelViewSet):
 
     queryset = User.objects.all()

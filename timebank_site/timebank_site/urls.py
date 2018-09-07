@@ -16,12 +16,12 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import include, path, re_path
 
-from timebank_app.views import appView
+from timebank_app.views import AppView
 
 urlpatterns = [
     path('', include('timebank_app.urls')),
     path('admin/', admin.site.urls),
     path('auth/', include('rest_auth.urls')),
     path('registration/', include('rest_auth.registration.urls')),
-    re_path(r'^.*/$', appView.as_view(), name='index_fallthrough')
+    re_path(r'^.*/$', AppView.as_view(), name='index_fallthrough')
 ]
