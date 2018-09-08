@@ -4,6 +4,7 @@
     v-bind:twentyFourClock = countdown.twentyFourClock
     v-bind:time = countdown.time
     v-bind:running = countdown.running
+    v-bind:paused = countdown.paused
   ></countdown>
     <v-form
       ref="createTask"
@@ -163,7 +164,8 @@ export default {
     countdown: {
       twentyFourClock: false,
       time: 0,
-      running: false
+      running: false,
+      paused: false
     }
   }),
   components: { countdown },
@@ -204,7 +206,7 @@ export default {
       this.countdown.running = true
     },
     pause: function (task) {
-      this.countdown.running = false
+      this.countdown.paused = true
     }
   }
 }

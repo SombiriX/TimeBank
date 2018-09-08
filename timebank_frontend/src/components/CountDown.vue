@@ -18,13 +18,15 @@ export default {
   props: {
     twentyFourClock: Boolean,
     time: Number,
-    running: Boolean
+    running: Boolean,
+    paused: Boolean
   },
   data: function () {
     return {
       selectedTime: 0,
       timeLeft: '00:00',
       endTime: '0',
+      secondsLeft: 0,
       dummy24Hr: this.twentyFourClock
     }
   },
@@ -39,7 +41,17 @@ export default {
         this.startCountDown(0)
         this.endTime = '0'
       }
-    }
+    },
+      paused: function (value) {
+        // Pause or resume the timer
+        if (value) {
+          // pause
+          clearInterval(intervalTimer)
+        } else {
+          // resume
+          this.startCountDown(this.secondsLeft)
+        }
+      }
   },
   methods: {
     startCountDown: function (seconds) {
@@ -59,17 +71,17 @@ export default {
     },
     _countdown: function (end) {
       intervalTimer = setInterval(() => {
-        const secondsLeft = Math.round((end - Date.now()) / 1000)
+        this.secondsLeft = Math.round((end - Date.now()) / 1000)
 
-        if (secondsLeft === 0) {
+        if (this.secondsLeft === 0) {
           this.endTime = 0
         }
 
-        if (secondsLeft < 0) {
+        if (this.secondsLeft < 0) {
           clearInterval(intervalTimer)
           return
         }
-        this.displayTimeLeft(secondsLeft)
+        this.displayTimeLeft(this.secondsLeft)
       }, 1000)
     },
     displayTimeLeft: function (secondsLeft) {
