@@ -31,34 +31,38 @@ class Task(Model):
 
     task_name = CharField(
         max_length=115,
-        default='',)
-    task_notes = TextField(null=True)
+        default='',
+    )
+    task_notes = TextField(blank=True)
     parent_task = ForeignKey(
         'self',
         on_delete=CASCADE,
-        null=True,)
+        blank=True,
+        null=True,
+    )
     task_type = CharField(
         max_length=1,
         choices=TASK_TYPE_CHOICES,
         default=discrete,)
     tasklist = ManyToManyField(
-        'self',)
+        'self',
+        blank=True,
+    )
     time_budget = DurationField(default=timedelta(0))
     is_complete = BooleanField(default=False)
     created = DateTimeField(auto_now_add=True)
-    last_added = DateTimeField(null=True)
+    last_added = DateTimeField(blank=True, null=True)
     last_modified = DateTimeField(auto_now=True)
     author = ForeignKey(User, related_name='tasks', on_delete=CASCADE)
 
 
 class Interval(Model):
     start = DateTimeField(default=timezone.now)
-    stop = DateTimeField(null=True)
+    stop = DateTimeField(blank=True, null=True)
     task = ForeignKey(
         Task,
         related_name='intervals',
         on_delete=CASCADE,
-        null=True
     )
     created = DateTimeField(auto_now_add=True)
     last_modified = DateTimeField(auto_now=True)
