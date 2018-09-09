@@ -16,12 +16,19 @@ const initialState = {
   tasks: [],
   running: false,
   runningTaskId: null,
+  paused: false,
   interval: null
 }
 
 const getters = {
   taskRunning: state => !!state.running,
-  runningTask: state => state.runningTaskId
+  runningTask: state => state.runningTaskId,
+  completedTasks: (state) => {
+    return state.tasks.filter(task => task.is_complete)
+  },
+  numCompleted: (state, getters) => {
+    return getters.completedTasks.length
+  }
 }
 
 const actions = {
@@ -47,16 +54,17 @@ const actions = {
       .then(() => commit(TASK_SUCCESS))
       .catch((err) => commit(TASK_FAIL, err))
   },
-  runTask ({ commit }, taskId) {
-    // Create interval
-    const newInterval = {
-      'start': Date.now(),
-      'task': taskId
+  runTask ({ commit, state }, taskId) {
+    if (!state.running) {
+      // Create interval
+      const newInterval = {
+        'task': taskId
+      }
+      return api.addInterval(newInterval)
+        .then(({ data }) => commit(TASK_RUN, data))
+        .then(() => commit(TASK_SUCCESS))
+        .catch((err) => commit(TASK_FAIL, err))
     }
-    return api.addInterval(newInterval)
-      .then(({ data }) => commit(TASK_RUN, data))
-      .then(() => commit(TASK_SUCCESS))
-      .catch((err) => commit(TASK_FAIL, err))
   },
   stopTask ({ commit, state }, taskId) {
     // Update interval

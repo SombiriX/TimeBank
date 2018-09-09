@@ -72,7 +72,3 @@ class IntervalViewSet(ModelViewSet):
         IsAuthenticated,
         AdminOrAuthorCanEdit,
     )
-
-    def perform_create(self, serializer):
-        serializer.save(author=self.request.user)
-        return super(IntervalViewSet, self).perform_create(serializer)

@@ -14,7 +14,7 @@
       <v-layout row>
         <v-flex xs10>
           <v-text-field
-            v-model="newTask.name"
+            v-model="newTask.task_name"
             label="What are you working on?"
             outline
             @keydown.enter="create"
@@ -24,7 +24,7 @@
         </v-flex>
         <v-flex xs2>
           <v-text-field
-            v-model="newTask.duration"
+            v-model="newTask.time_budget"
             name="name"
             label="Duration"
             outline
@@ -40,7 +40,7 @@
           <v-btn
             flat
             icon
-            v-if="newTask.name"
+            v-if="newTask.task_name"
             @click="create"
           >
             <v-icon>add_circle</v-icon>
@@ -53,7 +53,7 @@
         Tasks:&nbsp;
         <v-fade-transition leave-absolute>
           <span :key="`tasks-${tasks.length}`">
-            {{ completedTasks + " / " + tasks.length }}
+            {{ numCompleted + " / " + tasks.length }}
           </span>
         </v-fade-transition>
       </h2>
@@ -82,27 +82,27 @@
           ></v-divider>
 
           <v-list-tile
-            :key="`${i}-${task.text}`"
+            :key="`${i}-${task.task_name}`"
             @mouseover="task.active = true"
             @mouseleave="task.active = false"
           >
             <v-list-tile-action>
               <v-checkbox
-                v-model="task.done"
+                v-model="task.is_complete"
                 color="info"
               >
                 <div
                   slot="label"
-                  :class="task.done && 'grey--text' || 'text--primary'"
+                  :class="task.is_complete && 'grey--text' || 'text--primary'"
                   class="ml-3"
-                  v-text="task.text"
+                  v-text="task.task_name"
                 ></div>
               </v-checkbox>
             </v-list-tile-action>
 
             <v-spacer></v-spacer>
             <v-divider class="mx-2" inset vertical></v-divider>
-              {{ task.duration }}
+              {{ task.time_budget }}
             <v-divider class="mx-2" inset vertical></v-divider>
             <div  v-if="task.active">
               <v-btn flat icon @click="start(task)">
@@ -127,25 +127,26 @@
 
 <script>
 import countdown from '../components/CountDown'
+import { mapGetters, mapState } from 'vuex'
 
 export default {
   data: () => ({
-    tasks: [
-      {
-        id: 1,
-        done: false,
-        text: 'Foobar',
-        duration: '01:33',
-        active: false
-      },
-      {
-        id: 2,
-        done: false,
-        text: 'Fizzbuzz',
-        duration: '01:33',
-        active: false
-      }
-    ],
+    // tasks: [
+    //   {
+    //     id: 1,
+    //     is_complete: false,
+    //     task_name: 'Foobar',
+    //     time_budget: '01:33',
+    //     active: false
+    //   },
+    //   {
+    //     id: 2,
+    //     is_complete: false,
+    //     task_name: 'Fizzbuzz',
+    //     time_budget: '01:33',
+    //     active: false
+    //   }
+    // ],
     rules: {
       required: value => !!value || 'Required.',
       notZero: function (value) {
@@ -157,8 +158,8 @@ export default {
       }
     },
     newTask: {
-      name: null,
-      duration: ''
+      task_name: null,
+      time_budget: ''
     },
     taskValid: false,
     countdown: {
@@ -169,25 +170,39 @@ export default {
     }
   }),
   components: { countdown },
-  computed: {
-    completedTasks: function () {
-      return this.tasks.filter(task => task.done).length
-    },
-    progress: function () {
-      return this.completedTasks / this.tasks.length * 100
-    },
-    remainingTasks: function () {
-      return this.tasks.length - this.completedTasks
+  computed: Object.assign({},
+    mapState('task', [
+      'loading',
+      'error',
+      'errorMsg',
+      'tasks',
+      'running',
+      'runningTaskId',
+      'paused',
+      'interval'
+    ]),
+    mapGetters('task', {
+      taskRunning: 'taskRunning',
+      runningTask: 'runningTask',
+      completedTasks: 'completedTasks',
+      numCompleted: 'numCompleted'
+    }),
+    {
+      progress: function () {
+        return this.numCompleted / this.tasks.length * 100
+      },
+      remainingTasks: function () {
+        return this.tasks.length - this.numCompleted
+      }
     }
-  },
-
+  ),
   methods: {
     create: function () {
       if (this.$refs.createTask.validate()) {
         this.tasks.push({
-          done: false,
-          text: this.newTask.name,
-          duration: this.newTask.duration,
+          is_complete: false,
+          task_name: this.newTask.task_name,
+          time_budget: this.newTask.time_budget,
           active: false
         })
         this.$refs.createTask.reset()
@@ -201,9 +216,8 @@ export default {
       })
     },
     start: function (task) {
-      this.countdown.running = false
-      this.countdown.time = toSeconds(task.duration)
-      this.countdown.running = true
+      // Call vuex runTask action
+      this.$store.dispatch('task/runTask', task.id)
     },
     pause: function (task) {
       this.countdown.paused = true

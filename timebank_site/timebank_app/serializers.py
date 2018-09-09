@@ -43,7 +43,6 @@ class TaskSerializer(ModelSerializer):
 
 
 class IntervalSerializer(ModelSerializer):
-    task = HyperlinkedRelatedField(view_name='task-detail', read_only=True)
 
     class Meta:
         model = Interval

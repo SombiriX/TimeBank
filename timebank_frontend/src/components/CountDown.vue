@@ -42,16 +42,16 @@ export default {
         this.endTime = '0'
       }
     },
-      paused: function (value) {
-        // Pause or resume the timer
-        if (value) {
-          // pause
-          clearInterval(intervalTimer)
-        } else {
-          // resume
-          this.startCountDown(this.secondsLeft)
-        }
+    paused: function (value) {
+      // Pause or resume the timer
+      if (value) {
+        // Pause
+        clearInterval(intervalTimer)
+      } else {
+        // Resume
+        this.startCountDown(this.secondsLeft)
       }
+    }
   },
   methods: {
     startCountDown: function (seconds) {
