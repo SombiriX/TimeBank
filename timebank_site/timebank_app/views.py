@@ -17,11 +17,11 @@ class AppView(TemplateView):
 def current_user(request):
     user = request.user
     return Response({
-        "username": user.username,
-        "first_name": user.first_name,
-        "last_name": user.last_name,
-        "email": user.email,
-        "last_login": user.last_login,
-        "date_joined": user.date_joined,
-        "complete_anim": user.complete_anim,
+        "username": getattr(user, 'username', None),
+        "first_name": getattr(user, 'first_name', None),
+        "last_name": getattr(user, 'last_name', None),
+        "email": getattr(user, 'email', None),
+        "last_login": getattr(user, 'last_login', None),
+        "date_joined": getattr(user, 'date_joined', None),
+        "complete_anim": getattr(user, 'complete_anim', None),
     })
