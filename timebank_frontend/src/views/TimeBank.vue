@@ -131,22 +131,6 @@ import { mapGetters, mapState } from 'vuex'
 
 export default {
   data: () => ({
-    // tasks: [
-    //   {
-    //     id: 1,
-    //     is_complete: false,
-    //     task_name: 'Foobar',
-    //     time_budget: '01:33',
-    //     active: false
-    //   },
-    //   {
-    //     id: 2,
-    //     is_complete: false,
-    //     task_name: 'Fizzbuzz',
-    //     time_budget: '01:33',
-    //     active: false
-    //   }
-    // ],
     rules: {
       required: value => !!value || 'Required.',
       notZero: function (value) {

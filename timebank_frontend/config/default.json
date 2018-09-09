@@ -1,3 +1,4 @@
 {
-  "baseUrl": "/static"
+  "baseUrl": "/static",
+  "vagrantShared": 1500
 }

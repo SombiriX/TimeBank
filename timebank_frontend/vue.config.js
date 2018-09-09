@@ -15,5 +15,11 @@ module.exports = {
             filename: "bundle.js"
         },
     },
+    devServer: {
+        watchOptions: {
+            poll: config.get("vagrantShared"),
+            ignored: /node_modules/
+        }
+    },
     baseUrl: config.get("baseUrl")
 }

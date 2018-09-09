@@ -1,3 +1,4 @@
 {
-  "baseUrl": "https://zappa-bcobucket1.s3.amazonaws.com"
+  "baseUrl": "https://zappa-bcobucket1.s3.amazonaws.com",
+  "vagrantShared": false
 }
