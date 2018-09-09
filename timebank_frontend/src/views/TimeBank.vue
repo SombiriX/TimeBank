@@ -158,7 +158,7 @@ export default {
       }
     },
     newTask: {
-      task_name: null,
+      task_name: '',
       time_budget: ''
     },
     taskValid: false,
@@ -199,21 +199,17 @@ export default {
   methods: {
     create: function () {
       if (this.$refs.createTask.validate()) {
-        this.tasks.push({
-          is_complete: false,
+        // Call vuex action to create task
+        const newTask = {
           task_name: this.newTask.task_name,
-          time_budget: this.newTask.time_budget,
-          active: false
-        })
+          time_budget: this.newTask.time_budget
+        }
+        this.$store.dispatch('task/createTask', newTask)
         this.$refs.createTask.reset()
       }
     },
     remove: function (id) {
-      this.tasks = this.tasks.filter(function (task) {
-        if (task.id !== id) {
-          return task
-        }
-      })
+      this.$store.dispatch('task/deleteTask', id)
     },
     start: function (task) {
       // Call vuex runTask action

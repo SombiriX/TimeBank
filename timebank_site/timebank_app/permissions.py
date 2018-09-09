@@ -21,8 +21,4 @@ class AdminOrAuthorCanEdit(BasePermission):
         except AttributeError:
             is_author = False
 
-        if is_safe or is_author or request.user.is_superuser:
-            print("has_object_permission Request passed")
-        else:
-            print("has_object_permission Request failed")
         return is_safe or is_author or request.user.is_superuser
