@@ -1,6 +1,5 @@
 from datetime import timedelta
 from django.contrib.auth.models import AbstractUser
-from django.db.models.signals import post_save
 from django.db.models import (
     BooleanField,
     CASCADE,
