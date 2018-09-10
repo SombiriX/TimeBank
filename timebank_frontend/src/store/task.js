@@ -54,6 +54,7 @@ const actions = {
       .catch((err) => commit(TASK_FAIL, err))
   },
   deleteTask ({ commit }, taskId) {
+    // TODO Handle case where timer is running
     return api.deleteTask(taskId)
       .then(() => commit(TASK_DELETE_TASK, taskId))
       .then(() => commit(TASK_SUCCESS))
@@ -73,6 +74,11 @@ const actions = {
         .catch((err) => commit(TASK_FAIL, err))
     } else if (taskId !== state.runningTaskId) {
       // TODO Pause existing timer and start timer for a different task
+    }
+  },
+  pauseTask ({ commit, state, getters }, taskId) {
+    if (state.running) {
+      // TODO handle pausing
     }
   },
   stopTask ({ commit, state, getters }, taskId) {
