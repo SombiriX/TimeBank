@@ -7,6 +7,7 @@ import {
   TASK_SET_TASKLIST,
   TASK_DELETE_TASK,
   TASK_RUN,
+  TASK_NEW_INTERVAL,
   TASK_ADD_STOP_TIME,
   TASK_STOP
 } from './types'
@@ -19,7 +20,8 @@ const initialState = {
   running: false,
   runningTaskId: null,
   paused: false,
-  interval: null
+  interval: null,
+  time: 0
 }
 
 const getters = {
@@ -54,16 +56,20 @@ const actions = {
       .then(() => commit(TASK_SUCCESS))
       .catch((err) => commit(TASK_FAIL, err))
   },
-  runTask ({ commit, state }, taskId) {
+  runTask ({ commit, state }, taskID) {
     if (!state.running) {
-      // Create interval
+      // Create interval and start the timer
       const newInterval = {
-        'task': taskId
+        'task': taskID
       }
+      let taskIdx = state.tasks.findIndex((task) => { return task.id === taskID })
       return api.addInterval(newInterval)
-        .then(({ data }) => commit(TASK_RUN, data))
+        .then(({ data }) => commit(TASK_NEW_INTERVAL, data))
+        .then(() => commit(TASK_RUN, taskIdx))
         .then(() => commit(TASK_SUCCESS))
         .catch((err) => commit(TASK_FAIL, err))
+    } else if (taskID !== state.runningTaskId) {
+      // Pause existing timer and start timer for a different task
     }
   },
   stopTask ({ commit, state }, taskId) {
@@ -97,8 +103,12 @@ const mutations = {
   [TASK_DELETE_TASK] (state, taskId) {
     state.tasks = state.tasks.filter(task => task.id !== taskId)
   },
-  [TASK_RUN] (state, interval) {
+  [TASK_RUN] (state, taskIdx) {
+    state.time = toSeconds(state.tasks[taskIdx].time_budget)
     state.running = true
+    state.tasks[taskIdx].running = true
+  },
+  [TASK_NEW_INTERVAL] (state, interval) {
     state.runningTaskId = interval.task
     state.interval = interval
   },
@@ -134,6 +144,32 @@ function addFrontendFields (tasks) {
 }
 
 function _addFields (task) {
-  let active = { active: false }
-  return { ...task, ...active }
+  let addFields = {
+    active: false,
+    running: false
+  }
+  return { ...task, ...addFields }
+}
+
+function convertTimeString (timeStr) {
+  // Split string into hours and minutes
+  const components = timeStr.split(':')
+  const hours = parseInt(components[0], 10)
+  const minutes = parseInt(components[1], 10)
+
+  return {
+    'hours': hours,
+    'minutes': minutes
+  }
+}
+
+function toSeconds (timeStr) {
+  // Convert HH:SS time string to seconds
+  const time = convertTimeString(timeStr)
+  let seconds = 0
+
+  seconds += 60 * 60 * time.hours
+  seconds += 60 * time.minutes
+
+  return seconds
 }

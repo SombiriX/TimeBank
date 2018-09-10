@@ -2,9 +2,9 @@
   <v-container grid-list-md text-xs-center>
   <countdown
     v-bind:twentyFourClock = countdown.twentyFourClock
-    v-bind:time = countdown.time
-    v-bind:running = countdown.running
-    v-bind:paused = countdown.paused
+    v-bind:time = time
+    v-bind:running = running
+    v-bind:paused = paused
   ></countdown>
     <v-form
       ref="createTask"
@@ -81,10 +81,12 @@
             :key="`${i}-divider`"
           ></v-divider>
 
+          <!--TODO call setter-->
           <v-list-tile
             :key="`${i}-${task.task_name}`"
             @mouseover="task.active = true"
             @mouseleave="task.active = false"
+            :color="task.running ? 'success' : ''"
           >
             <v-list-tile-action>
               <v-checkbox
@@ -134,11 +136,9 @@ export default {
     rules: {
       required: value => !!value || 'Required.',
       notZero: function (value) {
-        const entry = convertTimeString(value)
-        const hasHours = entry.hours > 0
-        const hasMinutes = entry.minutes > 0
         const error = 'Time must be greater than zero'
-        return (hasHours || hasMinutes) || error
+        let zeroes = ['0', '00:', '00:0', '00:00']
+        return !(zeroes.includes(value)) || error
       }
     },
     newTask: {
@@ -163,7 +163,8 @@ export default {
       'running',
       'runningTaskId',
       'paused',
-      'interval'
+      'interval',
+      'time'
     ]),
     mapGetters('task', {
       taskRunning: 'taskRunning',
@@ -203,27 +204,5 @@ export default {
       this.countdown.paused = true
     }
   }
-}
-function convertTimeString (timeStr) {
-  // Split string into hours and minutes
-  const components = timeStr.split(':')
-  const hours = parseInt(components[0], 10)
-  const minutes = parseInt(components[1], 10)
-
-  return {
-    'hours': hours,
-    'minutes': minutes
-  }
-}
-
-function toSeconds (timeStr) {
-  // Convert time string to seconds
-  const time = convertTimeString(timeStr)
-  let seconds = 0
-
-  seconds += 60 * 60 * time.hours
-  seconds += 60 * time.minutes
-
-  return seconds
 }
 </script>
