@@ -89,10 +89,10 @@ const mutations = {
     state.error = false
   },
   [TASK_SET_TASK] (state, data) {
-    state.tasks.push(data)
+    state.tasks.push(addFrontendFields(data))
   },
   [TASK_SET_TASKLIST] (state, data) {
-    state.tasks = data
+    state.tasks = addFrontendFields(data)
   },
   [TASK_DELETE_TASK] (state, taskId) {
     state.tasks = state.tasks.filter(task => task.id !== taskId)
@@ -118,4 +118,22 @@ export default {
   getters,
   actions,
   mutations
+}
+
+function addFrontendFields (tasks) {
+  // Add fields to task objects which are only used on the frontend
+  if (Array.isArray(tasks)) {
+    // Add fields for task list
+    return tasks.map((task) => {
+      return _addFields(task)
+    })
+  } else {
+    // Add fields for single task
+    return _addFields(tasks)
+  }
+}
+
+function _addFields (task) {
+  let active = { active: false }
+  return { ...task, ...active }
 }
