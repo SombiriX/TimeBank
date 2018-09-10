@@ -186,11 +186,7 @@ export default {
     create: function () {
       if (this.$refs.createTask.validate()) {
         // Call vuex action to create task
-        const newTask = {
-          task_name: this.newTask.task_name,
-          time_budget: this.newTask.time_budget
-        }
-        this.$store.dispatch('task/createTask', newTask)
+        this.$store.dispatch('task/createTask', { ...this.newTask })
         this.$refs.createTask.reset()
       }
     },
