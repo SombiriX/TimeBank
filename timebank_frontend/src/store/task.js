@@ -160,7 +160,7 @@ function addFrontendFields (tasks) {
 function _addFields (task) {
   let addFields = {
     active: false,
-    running: false
+    running: false // TODO define this on server to allow start/stopping between sessions
   }
   return { ...task, ...addFields }
 }

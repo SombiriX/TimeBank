@@ -40,15 +40,13 @@ class TaskSerializer(ModelSerializer):
     def to_representation(self, instance):
         # Convert time_budget HH:MM:SS to HH:MM
         ret = super().to_representation(instance)
-        ret['time_budget'] = ret['time_budget'][0:5]  # TODO convert
-        print(repr(ret))
+        ret['time_budget'] = ret['time_budget'][0:5]
         return ret
 
     def to_internal_value(self, data):
         # Convert time_budget from HH:MM to HH:MM:SS
         data['time_budget'] += ":00"
         ret = super().to_internal_value(data)
-
         return ret
 
     class Meta:

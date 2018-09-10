@@ -85,10 +85,18 @@ export default {
       }, 1000)
     },
     displayTimeLeft: function (secondsLeft) {
+      const hours = Math.floor((secondsLeft % 216000) / 3600)
       const minutes = Math.floor((secondsLeft % 3600) / 60)
       const seconds = secondsLeft % 60
 
-      this.timeLeft = `${zeroPadded(minutes)}:${zeroPadded(seconds)}`
+      const displayHours = secondsLeft >= 3600
+      const displayMinutes = secondsLeft >= 60
+
+      this.timeLeft = (
+        `${displayHours ? zeroPadded(hours) + ':' : ''}` +
+        `${displayMinutes ? zeroPadded(minutes) + ':' : ''}` +
+        `${zeroPadded(seconds)}`
+      )
     },
     displayEndTime: function (timestamp) {
       const end = new Date(timestamp)
