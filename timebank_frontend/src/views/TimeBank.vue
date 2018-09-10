@@ -108,7 +108,8 @@
             <v-divider class="mx-2" inset vertical></v-divider>
             <div  v-if="task.active">
               <v-btn flat icon @click="start(task)">
-                <v-icon>play_arrow</v-icon>
+                <v-icon v-if="!task.running">play_arrow</v-icon>
+                <v-icon v-if="task.running">stop</v-icon>
               </v-btn>
               <v-btn flat icon @click="pause(task)">
                 <v-icon>pause</v-icon>
