@@ -186,6 +186,7 @@ export default {
     create: function () {
       if (this.$refs.createTask.validate()) {
         // Call vuex action to create task
+        this.newTask.time_budget = this.padTime(this.newTask.time_budget)
         this.$store.dispatch('task/createTask', { ...this.newTask })
         this.$refs.createTask.reset()
       }
@@ -204,6 +205,17 @@ export default {
     },
     pause: function (task) {
       this.$store.dispatch('task/pauseTask', task.id)
+    },
+    padTime: function (timeStr) {
+      // Takes a full or partial time string and
+      // returns string formatted as HH:MM
+      const components = this.$store.getters['task/getTimeObj'](timeStr)
+
+      if (isNaN(components.minutes)) {
+        return `${components.hours}:00`
+      } else {
+        return `${components.hours}:${components.minutes}`
+      }
     }
   }
 }

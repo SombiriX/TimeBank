@@ -35,6 +35,9 @@ const getters = {
   },
   getTaskIdxById: (state) => (id) => {
     return state.tasks.findIndex(task => task.id === id)
+  },
+  getTimeObj: (state) => (timeStr) => {
+    return convertTimeString(timeStr)
   }
 }
 
