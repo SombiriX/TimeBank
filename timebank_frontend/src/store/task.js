@@ -32,6 +32,9 @@ const getters = {
   },
   numCompleted: (state, getters) => {
     return getters.completedTasks.length
+  },
+  getTaskIdxById: (state) => (id) => {
+    return state.tasks.findIndex(task => task.id === id)
   }
 }
 
@@ -56,27 +59,28 @@ const actions = {
       .then(() => commit(TASK_SUCCESS))
       .catch((err) => commit(TASK_FAIL, err))
   },
-  runTask ({ commit, state }, taskID) {
+  runTask ({ commit, state, getters }, taskId) {
     if (!state.running) {
       // Create interval and start the timer
       const newInterval = {
-        'task': taskID
+        'task': taskId
       }
-      let taskIdx = state.tasks.findIndex((task) => { return task.id === taskID })
+      let taskIdx = getters.getTaskIdxById(taskId)
       return api.addInterval(newInterval)
         .then(({ data }) => commit(TASK_NEW_INTERVAL, data))
         .then(() => commit(TASK_RUN, taskIdx))
         .then(() => commit(TASK_SUCCESS))
         .catch((err) => commit(TASK_FAIL, err))
-    } else if (taskID !== state.runningTaskId) {
-      // Pause existing timer and start timer for a different task
+    } else if (taskId !== state.runningTaskId) {
+      // TODO Pause existing timer and start timer for a different task
     }
   },
-  stopTask ({ commit, state }, taskId) {
+  stopTask ({ commit, state, getters }, taskId) {
     // Update interval
-    commit(TASK_ADD_STOP_TIME, Date.now())
-    return api.updateInterval(state.interval, state.interval.id)
-      .then(commit(TASK_STOP, state.interval))
+    let taskIdx = getters.getTaskIdxById(taskId)
+    commit(TASK_ADD_STOP_TIME, new Date().toISOString())
+    return api.updateInterval({ ...state.interval })
+      .then(commit(TASK_STOP, taskIdx))
   }
 }
 
@@ -115,10 +119,11 @@ const mutations = {
   [TASK_ADD_STOP_TIME] (state, stopTime) {
     state.interval.stop = stopTime
   },
-  [TASK_STOP] (state) {
+  [TASK_STOP] (state, taskIdx) {
     state.running = false
     state.runningTaskId = null
     state.interval = null
+    state.tasks[taskIdx].running = false
   }
 }
 

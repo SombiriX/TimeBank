@@ -111,7 +111,7 @@
                 <v-icon v-if="!task.running">play_arrow</v-icon>
                 <v-icon v-if="task.running">stop</v-icon>
               </v-btn>
-              <v-btn flat icon @click="pause(task)">
+              <v-btn v-if="task.running" flat icon @click="pause(task)">
                 <v-icon>pause</v-icon>
               </v-btn>
               <v-btn flat icon >
@@ -198,11 +198,16 @@ export default {
       this.$store.dispatch('task/deleteTask', id)
     },
     start: function (task) {
-      // Call vuex runTask action
-      this.$store.dispatch('task/runTask', task.id)
+      if (!task.running) {
+        // Call vuex runTask action
+        this.$store.dispatch('task/runTask', task.id)
+      } else {
+        // Call vuex stopTask action
+        this.$store.dispatch('task/stopTask', task.id)
+      }
     },
     pause: function (task) {
-      this.countdown.paused = true
+      this.$store.dispatch('task/pauseTask', task.id)
     }
   }
 }

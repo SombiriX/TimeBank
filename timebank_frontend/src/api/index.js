@@ -56,8 +56,8 @@ export default {
   addInterval (interval) {
     return session.post('/interval/', interval)
   },
-  updateInterval (interval, id) {
-    return session.put(`/interval/${id}/`, interval)
+  updateInterval (interval) {
+    return session.put(`/interval/${interval.id}/`, interval)
   },
   deleteInterval (id) {
     return session.delete(`/interval/${id}/`)
