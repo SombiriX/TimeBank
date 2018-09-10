@@ -3,7 +3,7 @@
     <v-layout column align-center justify-center>
       <v-flex class="countdown">
         <span class="display-4">
-          {{ timeLeft }}
+          {{ overTime ? '+ ' + timeLeft : timeLeft }}
         </span>
       </v-flex>
       <v-flex><span class="display-1">{{ endTime }}</span></v-flex>
@@ -27,6 +27,7 @@ export default {
       timeLeft: '00:00',
       endTime: '0',
       secondsLeft: 0,
+      overTime: false,
       dummy24Hr: this.twentyFourClock
     }
   },
@@ -38,8 +39,10 @@ export default {
         this.startCountDown(this.time)
       } else {
         // Stop
-        this.startCountDown(0)
+        clearInterval(intervalTimer)
         this.endTime = '0'
+        this.timeLeft = '00:00'
+        this.overTime = false
       }
     },
     paused: function (value) {
@@ -49,7 +52,11 @@ export default {
         clearInterval(intervalTimer)
       } else {
         // Resume
-        this.startCountDown(this.secondsLeft)
+        if (!this.overTime) {
+          this.startCountDown(this.secondsLeft)
+        } else {
+          this._countUp()
+        }
       }
     }
   },
@@ -67,20 +74,31 @@ export default {
 
       this.selectedTime = seconds
       this.displayEndTime(end)
-      this._countdown(end)
+      this._countDown(end)
     },
-    _countdown: function (end) {
+    _countDown: function (end) {
       intervalTimer = setInterval(() => {
         this.secondsLeft = Math.round((end - Date.now()) / 1000)
 
         if (this.secondsLeft === 0) {
-          this.endTime = 0
+          // Countdown complete, display overage counter (count up)
+          // this.endTime = 0
+          // this.timeLeft = '00:00'
+          this.$emit('countDownComplete')
+          this.overTime = true
         }
 
         if (this.secondsLeft < 0) {
           clearInterval(intervalTimer)
+          this._countUp()
           return
         }
+        this.displayTimeLeft(this.secondsLeft)
+      }, 1000)
+    },
+    _countUp: function () {
+      intervalTimer = setInterval(() => {
+        this.secondsLeft = this.secondsLeft + 1
         this.displayTimeLeft(this.secondsLeft)
       }, 1000)
     },
