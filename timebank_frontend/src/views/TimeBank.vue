@@ -108,8 +108,8 @@
             <v-divider class="mx-2" inset vertical></v-divider>
             <div  v-if="task.active">
               <v-btn flat icon @click="start(task)">
-                <v-icon v-if="!task.running">play_arrow</v-icon>
-                <v-icon v-if="task.running">stop</v-icon>
+                <v-icon v-if="!task.running || paused">play_arrow</v-icon>
+                <v-icon v-else>stop</v-icon>
               </v-btn>
               <v-btn v-if="task.running" flat icon @click="pause(task)">
                 <v-icon>pause</v-icon>
@@ -195,7 +195,7 @@ export default {
       this.$store.dispatch('task/deleteTask', id)
     },
     start: function (task) {
-      if (!task.running) {
+      if (!task.running || this.paused) {
         // Call vuex runTask action
         this.$store.dispatch('task/runTask', task.id)
       } else {

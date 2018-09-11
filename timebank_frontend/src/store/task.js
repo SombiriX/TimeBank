@@ -9,7 +9,8 @@ import {
   TASK_RUN,
   TASK_NEW_INTERVAL,
   TASK_ADD_STOP_TIME,
-  TASK_STOP
+  TASK_STOP,
+  TASK_PAUSE
 } from './types'
 
 const initialState = {
@@ -64,7 +65,7 @@ const actions = {
       .catch((err) => commit(TASK_FAIL, err))
   },
   runTask ({ commit, state, getters }, taskId) {
-    if (!state.running) {
+    if (!state.running || state.paused) {
       // Create interval and start the timer
       const newInterval = {
         'task': taskId
@@ -80,8 +81,12 @@ const actions = {
     }
   },
   pauseTask ({ commit, state, getters }, taskId) {
-    if (state.running) {
-      // TODO handle pausing
+    if (state.running && !state.paused) {
+      // Handle pausing
+      let taskIdx = getters.getTaskIdxById(taskId)
+      commit(TASK_ADD_STOP_TIME, new Date().toISOString())
+      return api.updateInterval({ ...state.interval })
+        .then(commit(TASK_PAUSE, taskIdx))
     }
   },
   stopTask ({ commit, state, getters }, taskId) {
@@ -119,6 +124,7 @@ const mutations = {
   [TASK_RUN] (state, taskIdx) {
     state.time = toSeconds(state.tasks[taskIdx].time_budget)
     state.running = true
+    state.paused = false
     state.tasks[taskIdx].running = true
   },
   [TASK_NEW_INTERVAL] (state, interval) {
@@ -133,6 +139,9 @@ const mutations = {
     state.runningTaskId = null
     state.interval = null
     state.tasks[taskIdx].running = false
+  },
+  [TASK_PAUSE] (state, taskIdx) {
+    state.paused = true
   }
 }
 
