@@ -65,7 +65,7 @@ const actions = {
       .catch((err) => commit(TASK_FAIL, err))
   },
   runTask ({ commit, state, getters }, taskId) {
-    if (!state.running || (state.paused && taskId == state.runningTaskId)) {
+    if (!state.running || (state.paused && taskId === state.runningTaskId)) {
       // Create interval and start the timer
       const newInterval = {
         'task': taskId
