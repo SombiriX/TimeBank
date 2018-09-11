@@ -13,7 +13,7 @@
 
 <script>
 var intervalTimer
-
+// TODO handle pause unpause remaining time
 export default {
   props: {
     twentyFourClock: Boolean,
