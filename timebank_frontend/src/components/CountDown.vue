@@ -115,6 +115,11 @@ export default {
         `${displayMinutes ? zeroPadded(minutes) + ':' : ''}` +
         `${zeroPadded(seconds)}`
       )
+      let countdownStatus = {
+        secondsLeft: this.secondsLeft,
+        overTime: this.overTime
+      }
+      this.$emit('countDownTick', countdownStatus)
     },
     displayEndTime: function (timestamp) {
       const end = new Date(timestamp)
