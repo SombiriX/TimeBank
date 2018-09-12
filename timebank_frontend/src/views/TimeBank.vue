@@ -5,6 +5,7 @@
     v-bind:time = time
     v-bind:running = running
     v-bind:paused = paused
+    v-on:countDownTick="handleCountdownTick"
   ></countdown>
     <v-form
       ref="createTask"
@@ -130,6 +131,7 @@
 
 <script>
 import countdown from '../components/CountDown'
+import helpers from '../helpers'
 import { mapGetters, mapState } from 'vuex'
 
 export default {
@@ -148,10 +150,7 @@ export default {
     },
     taskValid: false,
     countdown: {
-      twentyFourClock: false,
-      time: 0,
-      running: false,
-      paused: false
+      twentyFourClock: false // TODO replace with vuex state value
     }
   }),
   components: { countdown },
@@ -163,13 +162,13 @@ export default {
       'tasks',
       'running',
       'runningTaskId',
+      'runningTaskIdx',
       'paused',
       'interval',
       'time'
     ]),
     mapGetters('task', {
       taskRunning: 'taskRunning',
-      runningTask: 'runningTask',
       completedTasks: 'completedTasks',
       numCompleted: 'numCompleted'
     }),
@@ -203,6 +202,15 @@ export default {
         this.$store.dispatch('task/stopTask', task.id)
       }
     },
+    handleCountdownTick: function (status) {
+      // Update displayed time on the running task
+      const timeObj = helpers.getTimeComponents(status.secondsLeft)
+      const newTime = `${helpers.zeroPadded(timeObj.hours)}:` +
+        `${helpers.zeroPadded(timeObj.minutes)}`
+      const overage = status.overTime ? '+ ' : ''
+
+      this.tasks[this.runningTaskIdx].time_budget = overage + newTime
+    },
     pause: function (task) {
       this.$store.dispatch('task/pauseTask', task.id)
     },
@@ -219,4 +227,5 @@ export default {
     }
   }
 }
+
 </script>
