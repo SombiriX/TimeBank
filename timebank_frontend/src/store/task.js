@@ -20,6 +20,7 @@ const initialState = {
   tasks: [],
   running: false,
   runningTaskId: null,
+  runningTaskIdx: null,
   paused: false,
   interval: null,
   time: 0
@@ -27,7 +28,6 @@ const initialState = {
 
 const getters = {
   taskRunning: state => !!state.running,
-  runningTask: state => state.runningTaskId,
   completedTasks: (state) => {
     return state.tasks.filter(task => task.is_complete)
   },
@@ -83,18 +83,16 @@ const actions = {
   pauseTask ({ commit, state, getters }, taskId) {
     if (state.running && !state.paused) {
       // Handle pausing
-      let taskIdx = getters.getTaskIdxById(taskId)
       commit(TASK_ADD_STOP_TIME, new Date().toISOString())
       return api.updateInterval({ ...state.interval })
-        .then(commit(TASK_PAUSE, taskIdx))
+        .then(commit(TASK_PAUSE))
     }
   },
   stopTask ({ commit, state, getters }, taskId) {
     // Update interval
-    let taskIdx = getters.getTaskIdxById(taskId)
     commit(TASK_ADD_STOP_TIME, new Date().toISOString())
     return api.updateInterval({ ...state.interval })
-      .then(commit(TASK_STOP, taskIdx))
+      .then(commit(TASK_STOP))
   }
 }
 
@@ -126,6 +124,7 @@ const mutations = {
     state.running = true
     state.paused = false
     state.tasks[taskIdx].running = true
+    state.runningTaskIdx = taskIdx
   },
   [TASK_NEW_INTERVAL] (state, interval) {
     state.runningTaskId = interval.task
@@ -134,13 +133,14 @@ const mutations = {
   [TASK_ADD_STOP_TIME] (state, stopTime) {
     state.interval.stop = stopTime
   },
-  [TASK_STOP] (state, taskIdx) {
+  [TASK_STOP] (state) {
     state.running = false
     state.runningTaskId = null
     state.interval = null
-    state.tasks[taskIdx].running = false
+    state.tasks[state.runningTaskIdx].running = false
+    state.runningTaskIdx = null
   },
-  [TASK_PAUSE] (state, taskIdx) {
+  [TASK_PAUSE] (state) {
     state.paused = true
   }
 }
