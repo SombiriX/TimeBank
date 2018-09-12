@@ -1,11 +1,11 @@
 <template>
   <v-container grid-list-md text-xs-center>
   <countdown
-    v-bind:twentyFourClock = countdown.twentyFourClock
-    v-bind:time = time
-    v-bind:running = running
-    v-bind:paused = paused
-    v-on:countDownTick="handleCountdownTick"
+    :twentyFourClock = countdown.twentyFourClock
+    :time = time
+    :running = running
+    :paused = paused
+    @countDownTick="handleCountdownTick"
   ></countdown>
     <v-form
       ref="createTask"
