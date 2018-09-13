@@ -41,8 +41,8 @@ export default {
   addTask (task) {
     return session.post('/task/', task)
   },
-  updateTask (task, id) {
-    return session.put(`/task/${id}/`, task)
+  updateTask (task) {
+    return session.put(`/task/${task.id}/`, task)
   },
   deleteTask (id) {
     return session.delete(`/task/${id}/`)

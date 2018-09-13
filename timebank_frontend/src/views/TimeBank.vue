@@ -93,6 +93,7 @@
               <v-checkbox
                 v-model="task.complete"
                 color="info"
+                @change="handleTaskComplete(task)"
               >
                 <div
                   slot="label"
@@ -210,6 +211,10 @@ export default {
       const overage = status.overTime ? '+ ' : ''
 
       this.tasks[this.runningTaskIdx].time_budget = overage + newTime
+    },
+    handleTaskComplete: function (task) {
+        // Call vuex completeTask action
+        this.$store.dispatch('task/completeTask', task.id)
     },
     pause: function (task) {
       this.$store.dispatch('task/pauseTask', task.id)
