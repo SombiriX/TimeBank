@@ -76,3 +76,17 @@ class IntervalViewSet(ModelViewSet):
         IsAuthenticated,
         AdminOrAuthorCanEdit,
     )
+
+    def perform_create(self, serializer):
+        # Set the interval's task to running
+        task = serializer.validated_data['task']
+        task.running = True
+        task.save()
+        return super(IntervalViewSet, self).perform_create(serializer)
+
+    def perform_update(self, serializer):
+        # Set the interval's task to stopped
+        task = serializer.validated_data['task']
+        task.running = False
+        task.save()
+        return super(IntervalViewSet, self).perform_create(serializer)
