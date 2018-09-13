@@ -48,7 +48,8 @@ class Task(Model):
         blank=True,
     )
     time_budget = DurationField(default=timedelta(0))
-    is_complete = BooleanField(default=False)
+    complete = BooleanField(default=False)
+    running = BooleanField(default=False)
     created = DateTimeField(auto_now_add=True)
     last_added = DateTimeField(blank=True, null=True)
     last_modified = DateTimeField(auto_now=True)

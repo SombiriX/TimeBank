@@ -29,7 +29,7 @@ const initialState = {
 const getters = {
   taskRunning: state => !!state.running,
   completedTasks: (state) => {
-    return state.tasks.filter(task => task.is_complete)
+    return state.tasks.filter(task => task.complete)
   },
   numCompleted: (state, getters) => {
     return getters.completedTasks.length
@@ -168,8 +168,7 @@ function addFrontendFields (tasks) {
 
 function _addFields (task) {
   let addFields = {
-    active: false,
-    running: false // TODO define this on server to allow start/stopping between sessions
+    active: false
   }
   return { ...task, ...addFields }
 }

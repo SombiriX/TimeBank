@@ -91,12 +91,12 @@
           >
             <v-list-tile-action>
               <v-checkbox
-                v-model="task.is_complete"
+                v-model="task.complete"
                 color="info"
               >
                 <div
                   slot="label"
-                  :class="task.is_complete && 'grey--text' || 'text--primary'"
+                  :class="task.complete && 'grey--text' || 'text--primary'"
                   class="ml-3"
                   v-text="task.task_name"
                 ></div>
