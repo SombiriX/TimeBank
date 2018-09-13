@@ -125,6 +125,7 @@ const mutations = {
   },
   [TASK_SET_TASK] (state, data) {
     state.tasks.push(addFrontendFields(data))
+    // TODO check to see if task is running, if running, get and store the interval and set up state and timer
   },
   [TASK_SET_TASKLIST] (state, data) {
     state.tasks = addFrontendFields(data)
