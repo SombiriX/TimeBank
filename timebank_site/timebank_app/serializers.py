@@ -2,6 +2,7 @@ from rest_framework.serializers import (
     HyperlinkedIdentityField,
     HyperlinkedRelatedField,
     ModelSerializer,
+    SerializerMethodField,
 )
 
 from .models import (
@@ -29,6 +30,16 @@ class UserSerializer(ModelSerializer):
 class TaskSerializer(ModelSerializer):
     author = HyperlinkedRelatedField(view_name='user-detail', read_only=True)
     intervals = HyperlinkedIdentityField(view_name='task-intervals')
+    running_interval = SerializerMethodField()
+
+    def get_running_interval(self, instance):
+        # Returns the most recent interval related to the task
+        if instance.running:
+            most_recent_interval = Interval.objects.filter(
+                task__pk=instance.pk).order_by('-created')[0]
+            return IntervalSerializer(most_recent_interval).data
+        else:
+            return None
 
     def get_validation_exclusions(self, *args, **kwargs):
         # exclude the author field as we supply it later on in the
