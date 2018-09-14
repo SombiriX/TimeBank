@@ -59,10 +59,6 @@ class TaskViewSet(ModelViewSet):
 
         return Response(serializer.data)
 
-    def runtime(self):
-        # TODO use intervals to calculate how long tasks has ran for
-        pass
-
     def perform_create(self, serializer):
         serializer.save(author=self.request.user)
         return super(TaskViewSet, self).perform_create(serializer)
