@@ -11,6 +11,7 @@ from rest_framework.serializers import (
     ModelSerializer,
     SerializerMethodField,
 )
+from datetime import timedelta
 
 
 class UserSerializer(ModelSerializer):
@@ -51,7 +52,7 @@ class TaskSerializer(ModelSerializer):
             .aggregate(total_duration=Sum(F('task_duration')))\
             .get('total_duration', None)
 
-        active_time = 0
+        active_time = timedelta(0)
         if instance.running:
             # Get the most recent interval and calculate the runtime
             # at this moment
