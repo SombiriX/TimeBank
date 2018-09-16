@@ -26,8 +26,15 @@ class UserViewSet(ModelViewSet):
     serializer_class = UserSerializer
 
     permission_classes = (
-        IsAdminUser,
+        IsAuthenticated,
     )
+
+    def get_queryset(self):
+        """
+        Only return info for the currently authenticated user.
+        """
+        user = self.request.user
+        return User.objects.filter(username=user.username)
 
     @action(methods=['get'], detail=True)
     def tasks(self, request, pk=None):
@@ -48,6 +55,13 @@ class TaskViewSet(ModelViewSet):
         IsAuthenticated,
         AdminOrAuthorCanEdit,
     )
+
+    def get_queryset(self):
+        """
+        Only return info for the currently authenticated user.
+        """
+        user = self.request.user
+        return Task.objects.filter(author=user)
 
     @action(methods=['get'], detail=True)
     def intervals(self, request, pk=None):
@@ -73,11 +87,19 @@ class IntervalViewSet(ModelViewSet):
         AdminOrAuthorCanEdit,
     )
 
+    def get_queryset(self):
+        """
+        Only return info for the currently authenticated user.
+        """
+        user = self.request.user
+        return Interval.objects.filter(author=user)
+
     def perform_create(self, serializer):
         # Set the interval's task to running
         task = serializer.validated_data['task']
         task.running = True
         task.save()
+        serializer.save(author=self.request.user)
         return super(IntervalViewSet, self).perform_create(serializer)
 
     def perform_update(self, serializer):
