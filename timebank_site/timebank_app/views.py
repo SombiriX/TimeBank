@@ -16,6 +16,10 @@ class AppView(TemplateView):
 @api_view(['GET'])
 def current_user(request):
     user = request.user
+    user_prefs = {
+        "complete_anim": getattr(user, 'complete_anim', None),
+        "twentyFourClock": getattr(user, 'twentyFourClock', None),
+    }
     return Response({
         "username": getattr(user, 'username', None),
         "first_name": getattr(user, 'first_name', None),
@@ -23,5 +27,5 @@ def current_user(request):
         "email": getattr(user, 'email', None),
         "last_login": getattr(user, 'last_login', None),
         "date_joined": getattr(user, 'date_joined', None),
-        "complete_anim": getattr(user, 'complete_anim', None),
+        "user_prefs": user_prefs,
     })

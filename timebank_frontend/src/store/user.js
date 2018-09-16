@@ -15,7 +15,8 @@ const initialState = {
 }
 
 const getters = {
-  hasInfo: state => state.loaded
+  hasInfo: state => state.loaded,
+  userPrefs: state => state.user.user_prefs
 }
 
 const actions = {

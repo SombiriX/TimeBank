@@ -16,6 +16,7 @@ from django.utils import timezone
 
 
 class User(AbstractUser):
+    twentyFourClock = BooleanField(default=False)
     complete_anim = IntegerField(default=0)
     created = DateTimeField(auto_now_add=True)
     last_modified = DateTimeField(auto_now=True)

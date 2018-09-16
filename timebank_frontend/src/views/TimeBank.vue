@@ -1,7 +1,7 @@
 <template>
   <v-container grid-list-md text-xs-center>
   <countdown
-    :twentyFourClock = countdown.twentyFourClock
+    :twentyFourClock = userPrefs.twentyFourClock
     :time = time
     :running = running
     :paused = paused
@@ -149,10 +149,7 @@ export default {
       task_name: '',
       time_budget: ''
     },
-    taskValid: false,
-    countdown: {
-      twentyFourClock: false // TODO replace with vuex state value
-    }
+    taskValid: false
   }),
   components: { countdown },
   computed: Object.assign({},
@@ -172,6 +169,9 @@ export default {
       taskRunning: 'taskRunning',
       completedTasks: 'completedTasks',
       numCompleted: 'numCompleted'
+    }),
+    mapGetters('user', {
+      userPrefs: 'userPrefs'
     }),
     {
       progress: function () {
@@ -213,8 +213,8 @@ export default {
       this.tasks[this.runningTaskIdx].time_budget = overage + newTime
     },
     handleTaskComplete: function (task) {
-        // Call vuex completeTask action
-        this.$store.dispatch('task/completeTask', task.id)
+      // Call vuex completeTask action
+      this.$store.dispatch('task/completeTask', task.id)
     },
     pause: function (task) {
       this.$store.dispatch('task/pauseTask', task.id)
