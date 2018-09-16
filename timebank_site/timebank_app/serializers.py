@@ -1,17 +1,17 @@
+from datetime import timedelta
 from django.db.models import F, Sum
 from django.utils import timezone
-from .models import (
-    Task,
-    Interval,
-    User,
-)
 from rest_framework.serializers import (
     HyperlinkedIdentityField,
     HyperlinkedRelatedField,
     ModelSerializer,
     SerializerMethodField,
 )
-from datetime import timedelta
+from .models import (
+    Task,
+    Interval,
+    User,
+)
 
 
 class UserSerializer(ModelSerializer):
@@ -41,8 +41,8 @@ class TaskSerializer(ModelSerializer):
             most_recent_interval = Interval.objects.filter(
                 task__pk=instance.pk).order_by('-created')[0]
             return IntervalSerializer(most_recent_interval).data
-        else:
-            return None
+
+        return None
 
     def get_runtime(self, instance):
         # Calculate how long the tasks has run for

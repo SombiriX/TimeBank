@@ -1,4 +1,4 @@
-from django.shortcuts import render, HttpResponse
+from django.shortcuts import render
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.generic import TemplateView
@@ -9,7 +9,7 @@ from rest_framework.response import Response
 class AppView(TemplateView):
 
     @method_decorator(ensure_csrf_cookie)
-    def get(self, request, *args, **kwargs):
+    def get(self, request):
         return render(request, 'index.html', context=None)
 
 
