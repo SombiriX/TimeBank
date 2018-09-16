@@ -2,7 +2,8 @@
   <v-container grid-list-md text-xs-center>
   <countdown
     :twentyFourClock = userPrefs.twentyFourClock
-    :time = time
+    :initialTime = initialTime
+    :elapsedTime = elapsedTime
     :running = running
     :paused = paused
     @countDownTick="handleCountdownTick"
@@ -163,7 +164,8 @@ export default {
       'runningTaskIdx',
       'paused',
       'interval',
-      'time'
+      'initialTime',
+      'elapsedTime'
     ]),
     mapGetters('task', {
       taskRunning: 'taskRunning',
@@ -182,6 +184,9 @@ export default {
       }
     }
   ),
+  mounted: function () {
+    this.$store.dispatch('task/setTaskState')
+  },
   methods: {
     create: function () {
       if (this.$refs.createTask.validate()) {

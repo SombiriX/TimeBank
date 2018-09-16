@@ -5,6 +5,7 @@ import {
   TASK_FAIL,
   TASK_SET_TASK,
   TASK_SET_TASKLIST,
+  TASK_SET_STATE,
   TASK_DELETE_TASK,
   TASK_RUN,
   TASK_NEW_INTERVAL,
@@ -24,7 +25,8 @@ const initialState = {
   runningTaskIdx: null,
   paused: false,
   interval: null,
-  time: 0
+  initialTime: 0,
+  elapsedTime: 0
 }
 
 const getters = {
@@ -51,6 +53,9 @@ const actions = {
       .then(({ data }) => commit(TASK_SET_TASKLIST, data))
       .then(() => commit(TASK_SUCCESS))
       .catch((err) => commit(TASK_FAIL, err))
+  },
+  setTaskState ({ commit }) {
+    return commit(TASK_SET_STATE)
   },
   createTask ({ commit }, task) {
     return api.addTask(task)
@@ -97,7 +102,7 @@ const actions = {
       .then(commit(TASK_STOP))
       .catch((err) => commit(TASK_FAIL, err))
   },
-  completeTask ({ actions, commit, getters, state}, taskId) {
+  completeTask ({ actions, commit, getters, state }, taskId) {
     // Update task's complete flag
     if (state.running) {
       actions.stopTask(taskId)
@@ -130,11 +135,29 @@ const mutations = {
   [TASK_SET_TASKLIST] (state, data) {
     state.tasks = addFrontendFields(data)
   },
+  [TASK_SET_STATE] (state) {
+    const running = state.tasks.filter(task => task.running)
+    if (running.length === 1) {
+      const runningTask = running[0]
+      let taskIdx = state.tasks.findIndex(task => task.id === runningTask.id)
+
+      state.initialTime = toSeconds(runningTask.time_budget)
+      state.elapsedTime = Math.round(runningTask.runtime)
+      state.running = true
+      state.paused = false
+      state.runningTaskIdx = taskIdx
+      state.runningTaskId = runningTask.id
+      state.interval = runningTask.running_interval
+    } else if (running.length > 1) {
+      throw Error('Multiple running tasks is an invalid state')
+    }
+  },
   [TASK_DELETE_TASK] (state, taskId) {
     state.tasks = state.tasks.filter(task => task.id !== taskId)
   },
   [TASK_RUN] (state, taskIdx) {
-    state.time = toSeconds(state.tasks[taskIdx].time_budget)
+    state.elapsedTime = 0
+    state.initialTime = toSeconds(state.tasks[taskIdx].time_budget)
     state.running = true
     state.paused = false
     state.tasks[taskIdx].running = true

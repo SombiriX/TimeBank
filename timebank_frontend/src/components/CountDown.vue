@@ -16,14 +16,28 @@ var intervalTimer
 // TODO handle pause unpause remaining time
 export default {
   props: {
-    twentyFourClock: Boolean,
-    time: Number,
-    running: Boolean,
-    paused: Boolean
+    twentyFourClock: {
+      type: Boolean,
+      default: false
+    },
+    initialTime: {
+      type: Number,
+      required: true
+    },
+    elapsedTime: {
+      type: Number
+    },
+    running: {
+      type: Boolean,
+      required: true
+    },
+    paused: {
+      type: Boolean,
+      default: false
+    }
   },
   data: function () {
     return {
-      selectedTime: 0,
       timeLeft: '00:00',
       endTime: '0',
       secondsLeft: 0,
@@ -36,7 +50,15 @@ export default {
       // Start / stop the timer
       if (value) {
         // Start
-        this.startCountDown(this.time)
+        if (this.initialTime >= this.elapsedTime) {
+          // Count down
+          this.overTime = false
+          this.startCountDown(this.initialTime - this.elapsedTime)
+        } else {
+          // Count up
+          this.overTime = true
+          this.startCountDown(this.elapsedTime - this.initialTime)
+        }
       } else {
         // Stop
         clearInterval(intervalTimer)
@@ -72,9 +94,14 @@ export default {
       const end = now + seconds * 1000
       this.displayTimeLeft(seconds)
 
-      this.selectedTime = seconds
-      this.displayEndTime(end)
-      this._countDown(end)
+      if (this.overTime) {
+        this.secondsLeft = seconds
+        this.displayEndTime(null)
+        this._countUp()
+      } else {
+        this.displayEndTime(end)
+        this._countDown(end)
+      }
     },
     _countDown: function (end) {
       intervalTimer = setInterval(() => {
@@ -122,6 +149,11 @@ export default {
       this.$emit('countDownTick', countdownStatus)
     },
     displayEndTime: function (timestamp) {
+      if (timestamp === null) {
+        this.endTime = ''
+        return
+      }
+
       const end = new Date(timestamp)
       const hour = end.getHours()
       const minutes = end.getMinutes()
