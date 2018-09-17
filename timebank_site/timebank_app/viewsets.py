@@ -1,5 +1,5 @@
 from rest_framework.decorators import action
-from rest_framework.permissions import IsAdminUser, IsAuthenticated
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.response import Response
 
@@ -92,14 +92,14 @@ class IntervalViewSet(ModelViewSet):
         Only return info for the currently authenticated user.
         """
         user = self.request.user
-        return Interval.objects.filter(author=user)
+        taskList = user.tasks.all().values_list('id', flat=True)
+        return Interval.objects.filter(task__in=taskList)
 
     def perform_create(self, serializer):
         # Set the interval's task to running
         task = serializer.validated_data['task']
         task.running = True
         task.save()
-        serializer.save(author=self.request.user)
         return super(IntervalViewSet, self).perform_create(serializer)
 
     def perform_update(self, serializer):
