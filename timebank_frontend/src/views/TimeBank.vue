@@ -107,7 +107,7 @@
 
             <v-spacer></v-spacer>
             <v-divider class="mx-2" inset vertical></v-divider>
-              {{ task.time_budget }}
+              {{ displayTaskTime(task) }}
             <v-divider class="mx-2" inset vertical></v-divider>
             <div  v-if="task.active">
               <v-btn flat icon @click="start(task)">
@@ -191,9 +191,14 @@ export default {
     create: function () {
       if (this.$refs.createTask.validate()) {
         // Call vuex action to create task
-        this.newTask.time_budget = this.padTime(this.newTask.time_budget)
+        let timeStr = this.padTime(this.newTask.time_budget)
+        this.newTask.time_budget = helpers.toSeconds(timeStr)
         this.$store.dispatch('task/createTask', { ...this.newTask })
+
+        // Reset fields and validation
         this.$refs.createTask.reset()
+        this.newTask.task_name = ''
+        this.newTask.time_budget = ''
       }
     },
     remove: function (id) {
@@ -210,12 +215,7 @@ export default {
     },
     handleCountdownTick: function (status) {
       // Update displayed time on the running task
-      const timeObj = helpers.getTimeComponents(status.secondsLeft)
-      const newTime = `${helpers.zeroPadded(timeObj.hours)}:` +
-        `${helpers.zeroPadded(timeObj.minutes)}`
-      const overage = status.overTime ? '+ ' : ''
-
-      this.tasks[this.runningTaskIdx].time_budget = overage + newTime
+      this.tasks[this.runningTaskIdx].runtime += 1
     },
     handleTaskComplete: function (task) {
       // Call vuex completeTask action
@@ -234,8 +234,18 @@ export default {
       } else {
         return `${components.hours}:${components.minutes}`
       }
+    },
+    displayTaskTime: function (task) {
+      const overtime = task.runtime > task.time_budget
+      const absTime = Math.abs(task.time_budget - task.runtime)
+
+      const timeObj = helpers.getTimeComponents(absTime)
+      const newTime = helpers.getTimeStr(timeObj)
+
+      const overage = overtime ? '+ ' : ''
+
+      return overage + newTime
     }
   }
 }
-
 </script>

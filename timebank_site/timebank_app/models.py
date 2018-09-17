@@ -1,11 +1,9 @@
-from datetime import timedelta
 from django.contrib.auth.models import AbstractUser
 from django.db.models import (
     BooleanField,
     CASCADE,
     CharField,
     DateTimeField,
-    DurationField,
     ForeignKey,
     IntegerField,
     ManyToManyField,
@@ -48,7 +46,7 @@ class Task(Model):
         'self',
         blank=True,
     )
-    time_budget = DurationField(default=timedelta(0))
+    time_budget = IntegerField(default=0)
     complete = BooleanField(default=False)
     running = BooleanField(default=False)
     created = DateTimeField(auto_now_add=True)
@@ -70,7 +68,6 @@ class Interval(Model):
     )
     created = DateTimeField(auto_now_add=True)
     last_modified = DateTimeField(auto_now=True)
-    author = ForeignKey(User, related_name='user_intervals', on_delete=CASCADE)
 
     def __str__(self):
         return "{}: {} - {}".format(self.pk, self.start, self.stop)

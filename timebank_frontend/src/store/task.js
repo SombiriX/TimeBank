@@ -1,4 +1,5 @@
 import api from '../api'
+import helpers from '../helpers'
 import {
   TASK_INIT_START,
   TASK_SUCCESS,
@@ -41,7 +42,7 @@ const getters = {
     return state.tasks.findIndex(task => task.id === id)
   },
   getTimeObj: (state) => (timeStr) => {
-    return convertTimeString(timeStr)
+    return helpers.convertTimeString(timeStr)
   }
 }
 
@@ -140,8 +141,8 @@ const mutations = {
       const runningTask = running[0]
       let taskIdx = state.tasks.findIndex(task => task.id === runningTask.id)
 
-      state.initialTime = toSeconds(runningTask.time_budget)
-      state.elapsedTime = Math.round(runningTask.runtime)
+      state.initialTime = runningTask.time_budget
+      state.elapsedTime = runningTask.runtime
       state.running = true
       state.paused = false
       state.runningTaskIdx = taskIdx
@@ -156,7 +157,7 @@ const mutations = {
   },
   [TASK_RUN] (state, taskIdx) {
     state.elapsedTime = 0
-    state.initialTime = toSeconds(state.tasks[taskIdx].time_budget)
+    state.initialTime = state.tasks[taskIdx].time_budget
     state.running = true
     state.paused = false
     state.tasks[taskIdx].running = true
@@ -210,27 +211,4 @@ function _addFields (task) {
     active: false
   }
   return { ...task, ...addFields }
-}
-
-function convertTimeString (timeStr) {
-  // Split string into hours and minutes
-  const components = timeStr.split(':')
-  const hours = parseInt(components[0], 10)
-  const minutes = parseInt(components[1], 10)
-
-  return {
-    'hours': hours,
-    'minutes': minutes
-  }
-}
-
-function toSeconds (timeStr) {
-  // Convert HH:SS time string to seconds
-  const time = convertTimeString(timeStr)
-  let seconds = 0
-
-  seconds += 60 * 60 * time.hours
-  seconds += 60 * time.minutes
-
-  return seconds
 }

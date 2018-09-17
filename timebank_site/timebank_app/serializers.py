@@ -45,7 +45,7 @@ class TaskSerializer(ModelSerializer):
         return None
 
     def get_runtime(self, instance):
-        # Calculate how long the tasks has run for
+        # Calculate how long the tasks has run for to the nearest second
         res = Interval.objects.filter(task__pk=instance.pk).order_by('-created')
         recorded_time = res\
             .annotate(task_duration=F('stop') - F('start'))\
@@ -59,7 +59,9 @@ class TaskSerializer(ModelSerializer):
             running_interval = res[0]
             active_time = timezone.now() - running_interval.start
 
-        return (active_time + recorded_time) if recorded_time else active_time
+        ret = (active_time + recorded_time) if recorded_time else active_time
+
+        return int(round(ret.total_seconds()))
 
     def get_validation_exclusions(self, *args, **kwargs):
         # exclude the author field as we supply it later on in the
@@ -67,18 +69,6 @@ class TaskSerializer(ModelSerializer):
         exclusions = super(
             TaskSerializer, self).get_validation_exclusions(*args, **kwargs)
         return exclusions + ['author']
-
-    def to_representation(self, instance):
-        # Convert time_budget HH:MM:SS to HH:MM
-        ret = super().to_representation(instance)
-        ret['time_budget'] = ret['time_budget'][0:5]
-        return ret
-
-    def to_internal_value(self, data):
-        # Convert time_budget from HH:MM to HH:MM:SS
-        data['time_budget'] += ":00"
-        ret = super().to_internal_value(data)
-        return ret
 
     class Meta:
         model = Task

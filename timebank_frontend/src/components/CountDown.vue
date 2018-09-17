@@ -117,6 +117,7 @@ export default {
 
         if (this.secondsLeft < 0) {
           clearInterval(intervalTimer)
+          this.displayEndTime(null)
           this._countUp()
           return
         }
