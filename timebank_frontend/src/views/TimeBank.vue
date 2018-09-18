@@ -214,8 +214,10 @@ export default {
       }
     },
     handleCountdownTick: function (status) {
-      // Update displayed time on the running task
-      this.tasks[this.runningTaskIdx].runtime += 1
+      if (this.running) {
+        // Update displayed time on the running task
+        this.tasks[this.runningTaskIdx].runtime += 1
+      }
     },
     handleTaskComplete: function (task) {
       // Call vuex completeTask action

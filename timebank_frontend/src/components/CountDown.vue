@@ -12,7 +12,6 @@
 </template>
 
 <script>
-var intervalTimer
 // TODO handle pause unpause remaining time
 export default {
   props: {
@@ -42,7 +41,8 @@ export default {
       endTime: '0',
       secondsLeft: 0,
       overTime: false,
-      dummy24Hr: this.twentyFourClock
+      dummy24Hr: this.twentyFourClock,
+      intervalTimer: null
     }
   },
   watch: {
@@ -61,7 +61,7 @@ export default {
         }
       } else {
         // Stop
-        clearInterval(intervalTimer)
+        clearInterval(this.intervalTimer)
         this.endTime = '0'
         this.timeLeft = '00:00'
         this.overTime = false
@@ -71,7 +71,7 @@ export default {
       // Pause or resume the timer
       if (value) {
         // Pause
-        clearInterval(intervalTimer)
+        clearInterval(this.intervalTimer)
       } else {
         // Resume
         if (!this.overTime) {
@@ -85,7 +85,7 @@ export default {
   methods: {
     startCountDown: function (seconds) {
       // Set the countdown time and clear any running timers
-      clearInterval(intervalTimer)
+      clearInterval(this.intervalTimer)
       this._timer(seconds)
     },
     _timer: function (seconds) {
@@ -104,7 +104,7 @@ export default {
       }
     },
     _countDown: function (end) {
-      intervalTimer = setInterval(() => {
+      this.intervalTimer = setInterval(() => {
         this.secondsLeft = Math.round((end - Date.now()) / 1000)
 
         if (this.secondsLeft === 0) {
@@ -116,7 +116,7 @@ export default {
         }
 
         if (this.secondsLeft < 0) {
-          clearInterval(intervalTimer)
+          clearInterval(this.intervalTimer)
           this.displayEndTime(null)
           this._countUp()
           return
@@ -125,7 +125,7 @@ export default {
       }, 1000)
     },
     _countUp: function () {
-      intervalTimer = setInterval(() => {
+      this.intervalTimer = setInterval(() => {
         this.secondsLeft = this.secondsLeft + 1
         this.displayTimeLeft(this.secondsLeft)
       }, 1000)

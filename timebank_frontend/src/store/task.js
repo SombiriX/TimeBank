@@ -71,7 +71,7 @@ const actions = {
       .then(() => commit(TASK_SUCCESS))
       .catch((err) => commit(TASK_FAIL, err))
   },
-  _runTask({ commit, getters }, taskId) {
+  _runTask ({ commit, getters, state }, taskId) {
     const newInterval = {
       'task': taskId
     }
@@ -82,17 +82,19 @@ const actions = {
       .then(() => commit(TASK_SUCCESS))
       .catch((err) => commit(TASK_FAIL, err))
   },
-  runTask ({ commit, state, getters, dispatch }, taskId) {
+  runTask ({ commit, dispatch, getters, state }, taskId) {
     if (!state.running || (state.paused && taskId === state.runningTaskId)) {
       // Create interval and start the timer
       return dispatch('_runTask', taskId)
     } else if (taskId !== state.runningTaskId) {
       // Stop existing timer and start timer for a different task
+      // TODO Add check so interval doesn't get updated twice
+      if (state.paused) { state.paused = false }
       return dispatch('stopTask', state.runningTaskId)
         .then(() => dispatch('_runTask', taskId))
     }
   },
-  pauseTask ({ commit, state, getters }, taskId) {
+  pauseTask ({ commit, state }, taskId) {
     if (state.running && !state.paused) {
       // Handle pausing
       commit(TASK_ADD_STOP_TIME, new Date().toISOString())
@@ -101,7 +103,7 @@ const actions = {
         .catch((err) => commit(TASK_FAIL, err))
     }
   },
-  stopTask ({ commit, state, getters }, taskId) {
+  stopTask ({ commit, state }, taskId) {
     // Update interval
     commit(TASK_ADD_STOP_TIME, new Date().toISOString())
     return api.updateInterval({ ...state.interval })
