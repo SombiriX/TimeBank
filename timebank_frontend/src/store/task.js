@@ -71,20 +71,25 @@ const actions = {
       .then(() => commit(TASK_SUCCESS))
       .catch((err) => commit(TASK_FAIL, err))
   },
-  runTask ({ commit, state, getters }, taskId) {
+  _runTask({ commit, getters }, taskId) {
+    const newInterval = {
+      'task': taskId
+    }
+    let taskIdx = getters.getTaskIdxById(taskId)
+    return api.addInterval(newInterval)
+      .then(({ data }) => commit(TASK_NEW_INTERVAL, data))
+      .then(() => commit(TASK_RUN, taskIdx))
+      .then(() => commit(TASK_SUCCESS))
+      .catch((err) => commit(TASK_FAIL, err))
+  },
+  runTask ({ commit, state, getters, dispatch }, taskId) {
     if (!state.running || (state.paused && taskId === state.runningTaskId)) {
       // Create interval and start the timer
-      const newInterval = {
-        'task': taskId
-      }
-      let taskIdx = getters.getTaskIdxById(taskId)
-      return api.addInterval(newInterval)
-        .then(({ data }) => commit(TASK_NEW_INTERVAL, data))
-        .then(() => commit(TASK_RUN, taskIdx))
-        .then(() => commit(TASK_SUCCESS))
-        .catch((err) => commit(TASK_FAIL, err))
+      return dispatch('_runTask', taskId)
     } else if (taskId !== state.runningTaskId) {
-      // TODO Stop existing timer and start timer for a different task
+      // Stop existing timer and start timer for a different task
+      return dispatch('stopTask', state.runningTaskId)
+        .then(() => dispatch('_runTask', taskId))
     }
   },
   pauseTask ({ commit, state, getters }, taskId) {
