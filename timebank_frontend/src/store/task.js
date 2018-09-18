@@ -156,7 +156,7 @@ const mutations = {
     state.tasks = state.tasks.filter(task => task.id !== taskId)
   },
   [TASK_RUN] (state, taskIdx) {
-    state.elapsedTime = 0
+    state.elapsedTime = state.tasks[taskIdx].runtime
     state.initialTime = state.tasks[taskIdx].time_budget
     state.running = true
     state.paused = false
