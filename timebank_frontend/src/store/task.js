@@ -88,9 +88,7 @@ const actions = {
       return dispatch('_runTask', taskId)
     } else if (taskId !== state.runningTaskId) {
       // Stop existing timer and start timer for a different task
-      // TODO Add check so interval doesn't get updated twice
-      if (state.paused) { state.paused = false }
-      return dispatch('stopTask', state.runningTaskId)
+      return dispatch('stopTask', state.paused)
         .then(() => dispatch('_runTask', taskId))
     }
   },
@@ -103,10 +101,13 @@ const actions = {
         .catch((err) => commit(TASK_FAIL, err))
     }
   },
-  stopTask ({ commit, state }, taskId) {
-    // Update interval
+  stopTask ({ commit, state }) {
+    // Stop running task and update interval if task is not
+    // paused (interval already stopped)
+    let action = state.paused ? v => Promise.resolve(v) : api.updateInterval
+    state.paused = false
     commit(TASK_ADD_STOP_TIME, new Date().toISOString())
-    return api.updateInterval({ ...state.interval })
+    return action({ ...state.interval })
       .then(commit(TASK_STOP))
       .catch((err) => commit(TASK_FAIL, err))
   },
