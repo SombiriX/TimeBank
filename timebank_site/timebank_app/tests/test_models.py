@@ -42,6 +42,7 @@ class TaskModelTest(TestCase):
             author=self.user
         )
 
+# Check field labels
     def test_task_name_label(self):
         field_label = self.task._meta.get_field('task_name').verbose_name
         self.assertEquals(field_label, 'task name')
@@ -78,3 +79,8 @@ class TaskModelTest(TestCase):
     def test_author_label(self):
         field_label = self.task._meta.get_field('author').verbose_name
         self.assertEquals(field_label, 'author')
+
+# Check string representation
+    def test__str__method(self):
+        string_rep = self.task.__str__()
+        self.assertEquals(string_rep, '1: TEST')
