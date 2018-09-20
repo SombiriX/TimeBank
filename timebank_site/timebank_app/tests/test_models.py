@@ -35,6 +35,7 @@ class TaskModelTest(TestCase):
         cls.invalid_name = ''.join('a' for x in range(cls.name_limit+1))
 
         cls.valid_types = ['C', 'D']
+        cls.invalid_fail_exceptions = 1
         cls.invalid_types = ['A', 'aa', '']
 
     def setUp(self):
@@ -52,41 +53,77 @@ class TaskModelTest(TestCase):
 
 # Check field labels
     def test_task_name_label(self):
-        field_label = self.task._meta.get_field('task_name').verbose_name #pylint: disable=W0212
-        self.assertEqual(field_label, 'task name')
+        #pylint: disable=W0212
+        self.assertEqual(
+            self.task._meta.get_field('task_name').verbose_name,
+            'task name'
+        )
     def test_task_notes_label(self):
-        field_label = self.task._meta.get_field('task_notes').verbose_name #pylint: disable=W0212
-        self.assertEqual(field_label, 'task notes')
+        #pylint: disable=W0212
+        self.assertEqual(
+            self.task._meta.get_field('task_notes').verbose_name,
+            'task notes'
+        )
     def test_parent_task_label(self):
-        field_label = self.task._meta.get_field('parent_task').verbose_name #pylint: disable=W0212
-        self.assertEqual(field_label, 'parent task')
+        #pylint: disable=W0212
+        self.assertEqual(
+            self.task._meta.get_field('parent_task').verbose_name,
+            'parent task'
+        )
     def test_task_type_label(self):
-        field_label = self.task._meta.get_field('task_type').verbose_name #pylint: disable=W0212
-        self.assertEqual(field_label, 'task type')
+        #pylint: disable=W0212
+        self.assertEqual(
+            self.task._meta.get_field('task_type').verbose_name,
+            'task type'
+        )
     def test_tasklist_label(self):
-        field_label = self.task._meta.get_field('tasklist').verbose_name #pylint: disable=W0212
-        self.assertEqual(field_label, 'tasklist')
+        #pylint: disable=W0212
+        self.assertEqual(
+            self.task._meta.get_field('tasklist').verbose_name,
+            'tasklist'
+        )
     def test_time_budget_label(self):
-        field_label = self.task._meta.get_field('time_budget').verbose_name #pylint: disable=W0212
-        self.assertEqual(field_label, 'time budget')
+        #pylint: disable=W0212
+        self.assertEqual(
+            self.task._meta.get_field('time_budget').verbose_name,
+            'time budget'
+        )
     def test_complete_label(self):
-        field_label = self.task._meta.get_field('complete').verbose_name #pylint: disable=W0212
-        self.assertEqual(field_label, 'complete')
+        #pylint: disable=W0212
+        self.assertEqual(
+            self.task._meta.get_field('complete').verbose_name,
+            'complete'
+        )
     def test_running_label(self):
-        field_label = self.task._meta.get_field('running').verbose_name #pylint: disable=W0212
-        self.assertEqual(field_label, 'running')
+        #pylint: disable=W0212
+        self.assertEqual(
+            self.task._meta.get_field('running').verbose_name,
+            'running'
+        )
     def test_created_label(self):
-        field_label = self.task._meta.get_field('created').verbose_name #pylint: disable=W0212
-        self.assertEqual(field_label, 'created')
+        #pylint: disable=W0212
+        self.assertEqual(
+            self.task._meta.get_field('created').verbose_name,
+            'created'
+        )
     def test_last_added_label(self):
-        field_label = self.task._meta.get_field('last_added').verbose_name #pylint: disable=W0212
-        self.assertEqual(field_label, 'last added')
+        #pylint: disable=W0212
+        self.assertEqual(
+            self.task._meta.get_field('last_added').verbose_name,
+            'last added'
+        )
     def test_last_modified_label(self):
-        field_label = self.task._meta.get_field('last_modified').verbose_name #pylint: disable=W0212
-        self.assertEqual(field_label, 'last modified')
+        #pylint: disable=W0212
+        self.assertEqual(
+            self.task._meta.get_field('last_modified').verbose_name,
+            'last modified'
+        )
     def test_author_label(self):
-        field_label = self.task._meta.get_field('author').verbose_name #pylint: disable=W0212
-        self.assertEqual(field_label, 'author')
+        #pylint: disable=W0212
+        self.assertEqual(
+            self.task._meta.get_field('author').verbose_name,
+            'author'
+        )
 
 # Check string representation
     def test__str__method(self):
@@ -111,7 +148,7 @@ class TaskModelTest(TestCase):
         try:
             self.task.save()
         except DataError:
-            self.assertTrue(True)
+            # Test passes on DataError
             return
         self.fail("Expected to raise DataError")
     def test_task_type_valid(self):
@@ -134,5 +171,8 @@ class TaskModelTest(TestCase):
         self.assertEqual(
             exceptions,
             1,
-            "Did not fail for correct number of cases"
+            "Test failed for {} cases, expected {}".format(
+                exceptions,
+                self.invalid_fail_exceptions,
+            )
         )
