@@ -35,7 +35,7 @@ class TaskModelTest(TestCase):
         cls.invalid_name = ''.join('a' for x in range(cls.name_limit+1))
 
         cls.valid_types = ['C', 'D']
-        cls.invalid_fail_exceptions = 1
+        cls.type_num_fail_exceptions = 1
         cls.invalid_types = ['A', 'aa', '']
 
     def setUp(self):
@@ -173,6 +173,6 @@ class TaskModelTest(TestCase):
             1,
             "Test failed for {} cases, expected {}".format(
                 exceptions,
-                self.invalid_fail_exceptions,
+                self.type_num_fail_exceptions,
             )
         )
