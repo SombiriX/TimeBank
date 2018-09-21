@@ -14,6 +14,110 @@ from timebank_app.serializers import (
 )
 
 
+class UserSerializerTest(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        # Set up non-modified objects used by all test methods
+        cls.user = User.objects.create_user(
+            username='testuser',
+            password='12345'
+        )
+
+        cls.factory = RequestFactory()
+
+    def setUp(self):
+        self.login = self.client.login(
+            username='testuser',
+            password='12345'
+        )
+
+        self.serializer_data = {
+            'task_name': 'TASK NAME',
+            'time_budget': 600,
+        }
+
+        self.test_user = User.objects.all()[0]
+        self.request = self.factory.get('/some_path')
+        self.serializer = UserSerializer(
+            instance=self.test_user,
+            context={'request': self.request})
+
+    def test_field_names(self):
+        # Check that serializer fields match expected values
+        data = self.serializer.data
+
+        field_names = [
+            'username',
+            'id',
+            'first_name',
+            'last_name',
+            'tasks',
+        ]
+        self.assertCountEqual(data.keys(), field_names)
+
+
+class IntervalSerializerTest(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        # Set up non-modified objects used by all test methods
+        cls.user = User.objects.create_user(
+            username='testuser',
+            password='12345'
+        )
+
+        cls.factory = RequestFactory()
+
+    def setUp(self):
+        self.login = self.client.login(
+            username='testuser',
+            password='12345'
+        )
+
+        Task.objects.create(
+            task_name='TEST',
+            time_budget=3600,
+            author=self.user
+        ).save()
+
+        self.task = Task.objects.all()[0]
+
+        self.interval_attributes = {
+            'start': '2018-09-18T06:14:37.712159Z',
+            'stop': '2018-09-18T07:14:37.712159Z',
+            'task': self.task,
+            'created': '',
+            'last_modified': '',
+        }
+
+        self.serializer_data = {
+            'start': '2017-09-18T06:14:37.712159Z',
+            'stop': '2017-09-18T07:14:37.712159Z',
+            'task': self.task,
+            'created': '2017-09-18T06:14:37.712159Z',
+            'last_modified': '2017-09-18T06:14:37.712159Z',
+        }
+
+        self.interval = Interval.objects.create(**self.interval_attributes)
+        self.request = self.factory.get('/some_path')
+        self.serializer = IntervalSerializer(
+            instance=self.interval,
+            context={'request': self.request})
+
+    def test_field_names(self):
+        # Check that serializer fields match expected values
+        data = self.serializer.data
+
+        field_names = [
+            'created',
+            'id',
+            'last_modified',
+            'start',
+            'stop',
+            'task',
+        ]
+        self.assertCountEqual(data.keys(), field_names)
+
+
 class TaskSerializerTest(TestCase):
     @classmethod
     def setUpTestData(cls):
