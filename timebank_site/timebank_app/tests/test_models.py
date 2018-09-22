@@ -1,5 +1,6 @@
 from django.db import DataError, transaction
 from django.test import TestCase
+from django.utils import timezone
 
 from timebank_app.models import (
     User,
@@ -8,14 +9,7 @@ from timebank_app.models import (
 )
 
 
-# class IntervalModelTest(TestCase):
-#     @classmethod
-#     def setUpTestData(cls):
-#         # Set up non-modified objects used by all test methods
-#         Task.objects.create()
-
-
-class UserModelTest(TestCase):
+class IntervalModelTest(TestCase):
     @classmethod
     def setUpTestData(cls):
         # Set up non-modified objects used by all test methods
@@ -35,6 +29,68 @@ class UserModelTest(TestCase):
             task_name='TEST',
             time_budget=3600,
             author=self.user
+        )
+
+        self.interval = Interval.objects.create(
+            task=self.task
+        )
+
+    def test_start_label(self):
+        #pylint: disable=W0212
+        self.assertEqual(
+            self.interval._meta.get_field('start').verbose_name,
+            'start'
+            )
+    def test_stop_label(self):
+        #pylint: disable=W0212
+        self.assertEqual(
+            self.interval._meta.get_field('stop').verbose_name,
+            'stop'
+            )
+    def test_task_label(self):
+        #pylint: disable=W0212
+        self.assertEqual(
+            self.interval._meta.get_field('task').verbose_name,
+            'task'
+            )
+    def test_created_label(self):
+        #pylint: disable=W0212
+        self.assertEqual(
+            self.interval._meta.get_field('created').verbose_name,
+            'created'
+            )
+    def test_last_modified_label(self):
+        #pylint: disable=W0212
+        self.assertEqual(
+            self.interval._meta.get_field('last_modified').verbose_name,
+            'last modified'
+            )
+    def test__str__method(self):
+        string_rep = self.interval.__str__()
+        self.assertEqual(
+            string_rep,
+            "{}: {} - {}".format(
+                self.interval.pk,
+                self.interval.start,
+                self.interval.stop
+            )
+        )
+
+
+class UserModelTest(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        # Set up non-modified objects used by all test methods
+        cls.user = User.objects.create_user(
+            username='testuser',
+            password='12345'
+        )
+
+    def setUp(self):
+
+        self.login = self.client.login(
+            username='testuser',
+            password='12345'
         )
 
 # Check field labels
