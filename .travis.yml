@@ -1,0 +1,38 @@
+matrix:
+  include:
+    - language: python
+      python: 3.6
+      addons:
+        postgresql: "9.5"
+      services:
+        - postgresql
+      install:
+        - pip install -r requirements.txt
+      before_script:
+        - psql -c 'create database timebank_app;' -U postgres
+        - psql -c "CREATE USER timebank WITH PASSWORD 'DEBUG';" -U postgres
+        - psql -c "ALTER USER timebank CREATEDB;" -U postgres
+      script:
+        - python timebank_site/manage.py makemigrations
+        - python timebank_site/manage.py migrate
+        - python timebank_site/manage.py migrate --run-syncdb
+        - python timebank_site/manage.py test timebank_app.tests
+
+    - language: node_js
+      node_js:
+        - "node"
+      before_install:
+        -  cd timebank_frontend
+      cache:
+        directories:
+          - "node_modules"
+      install:
+        - npm install
+      script:
+        - npm run test:unit
+        # - npm run test:e2e
+        - npm run build
+
+notifications:
+  email:
+    - email@example.com
