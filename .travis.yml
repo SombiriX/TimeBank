@@ -1,0 +1,31 @@
+matrix:
+  include:
+    - language: python
+      python: 3.6
+      services:
+        - postgresql
+      env:
+        -DJANGO=2.1 DB=postgresql
+      install:
+        - pip install -r requirements.txt
+      before_script:
+        - psql -c 'create database timebank_app;' -U postgres
+        - psql -c "CREATE USER timebank WITH PASSWORD 'DEBUG';" -U postgres
+      script:
+        - python timebank_site/manage.py test timebank_app.tests
+
+    # - language: android
+    #   jdk: oraclejdk8
+    #   android:
+    #     components:
+    #       - tools
+    #       - android-25
+    #       - build-tools-25.0.3
+    #   before_script:
+    #     - cd android/AppName
+    #   script:
+    #     - ./gradlew build connectedCheck
+
+notifications:
+  email:
+    - email@example.com
