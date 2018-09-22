@@ -20,9 +20,12 @@ matrix:
 
     - language: node_js
       node_js:
-        - 8.11
+        - "node"
       before_install:
         -  cd timebank_frontend
+      cache:
+        directories:
+          - "node_modules"
       install:
         - npm install
       script:
