@@ -18,17 +18,17 @@ matrix:
         - python timebank_site/manage.py migrate --run-syncdb
         - python timebank_site/manage.py test timebank_app.tests
 
-    # - language: android
-    #   jdk: oraclejdk8
-    #   android:
-    #     components:
-    #       - tools
-    #       - android-25
-    #       - build-tools-25.0.3
-    #   before_script:
-    #     - cd android/AppName
-    #   script:
-    #     - ./gradlew build connectedCheck
+    - language: node_js
+      node_js:
+        - 8.11
+      before_install:
+        -  cd timebank_frontend
+      install:
+        - npm install
+      script:
+        - npm run test:unit
+        # - npm run test:e2e
+        - npm run build
 
 notifications:
   email:
