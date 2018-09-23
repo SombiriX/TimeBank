@@ -346,7 +346,19 @@ class IntervalViewSetTest(APITestCase):
 
         self.invalid_payload4 = {
             'task': self.task.id,
-            'stop': ''
+            'stop': '',
+        }
+
+        self.invalid_payload5 = {
+            'task': self.task.id,
+            'start': timezone.now() - timezone.timedelta(minutes=10),
+            'stop': timezone.now() - timezone.timedelta(minutes=20),
+        }
+
+        self.invalid_payload6 = {
+            'task': self.task.id,
+            'start': timezone.now() + timezone.timedelta(minutes=10),
+            'stop': timezone.now() + timezone.timedelta(minutes=20),
         }
 
     def test_get_all_intervals(self):
@@ -454,6 +466,7 @@ class IntervalViewSetTest(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
     def test_create_interval_invalid(self):
+        #TODO break this up
         test_url = reverse('interval-list')
 
         response = self.client.post(
@@ -480,6 +493,20 @@ class IntervalViewSetTest(APITestCase):
         response = self.client.post(
             test_url,
             data=self.invalid_payload4
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+        response = self.client.post(
+            test_url,
+            data=self.invalid_payload5
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+        response = self.client.post(
+            test_url,
+            data=self.invalid_payload6
         )
 
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)

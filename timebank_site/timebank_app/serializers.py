@@ -92,6 +92,12 @@ class TaskSerializer(ModelSerializer):
 
 class IntervalSerializer(ModelSerializer):
 
+    def validate(self, attrs):
+        # TODO ensure stop time is after start time and
+        # both start / stop times are in the past or present
+        # import pudb; pudb.set_trace()
+        return attrs
+
     class Meta:
         model = Interval
         fields = '__all__'
