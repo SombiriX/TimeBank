@@ -52,6 +52,7 @@ INSTALLED_APPS = [
     # REST Authentication
     'allauth',
     'allauth.account',
+    'allauth.socialaccount', # Workaround for /django-rest-auth/issues/412
     'rest_auth.registration',
 
     # Webpack Integration
