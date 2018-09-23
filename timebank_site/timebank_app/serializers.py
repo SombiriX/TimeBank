@@ -6,6 +6,7 @@ from rest_framework.serializers import (
     HyperlinkedRelatedField,
     ModelSerializer,
     SerializerMethodField,
+    ValidationError,
 )
 from .models import (
     Task,
@@ -69,6 +70,20 @@ class TaskSerializer(ModelSerializer):
         exclusions = super(
             TaskSerializer, self).get_validation_exclusions(*args, **kwargs)
         return exclusions + ['author']
+
+    def validate(self, attrs):
+        # Verify that required fields are properly formatted
+        # TODO remove fields which should not be set manually eg 'running'
+        t_name = attrs.get('task_name', None)
+        t_budget = attrs.get('time_budget', None)
+
+        if t_name in ('', None) or not isinstance(t_name, str):
+            raise ValidationError('A valid task_name is required')
+        if t_budget is not None and not isinstance(t_budget, int):
+            raise ValidationError(
+                'Time budget should be integer seconds'
+            )
+        return attrs
 
     class Meta:
         model = Task
