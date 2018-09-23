@@ -69,13 +69,11 @@ class IntervalSerializerTest(TestCase):
             password='12345'
         )
 
-        Task.objects.create(
+        self.task = Task.objects.create(
             task_name='TEST',
             time_budget=3600,
             author=self.user
-        ).save()
-
-        self.task = Task.objects.all()[0]
+        )
 
         self.interval_attributes = {
             'start': '2018-09-18T06:14:37.712159Z',
