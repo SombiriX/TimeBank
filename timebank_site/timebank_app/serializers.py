@@ -93,9 +93,17 @@ class TaskSerializer(ModelSerializer):
 class IntervalSerializer(ModelSerializer):
 
     def validate(self, attrs):
-        # TODO ensure stop time is after start time and
+        # Ensure stop time is after start time and
         # both start / stop times are in the past or present
-        # import pudb; pudb.set_trace()
+        right_now = timezone.now()
+        if not isinstance(attrs['start'], timezone.datetime):
+            raise ValidationError('Invalid start value')
+        if not isinstance(attrs['stop'], timezone.datetime):
+            raise ValidationError('Invalid stop value')
+        if attrs['stop'] < attrs['start']:
+            raise ValidationError('Stop time should be after start time')
+        if attrs['start'] > right_now or attrs['start'] > right_now:
+            raise ValidationError('Times should be in the past or present')
         return attrs
 
     class Meta:
