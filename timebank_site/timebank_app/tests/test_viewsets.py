@@ -577,3 +577,297 @@ class IntervalViewSetTest(APITestCase):
             test_url
         )
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+
+class UserViewSetTest(APITestCase):
+    # pylint: disable=too-many-instance-attributes
+    # instances are necessary for testing
+    @classmethod
+    def setUpTestData(cls):
+        # Set up non-modified objects used by all test methods
+        cls.user = User.objects.create_user(
+            username='testuser1',
+            password='12345'
+        )
+
+        cls.other_user1 = User.objects.create_user(
+            username='testuser2',
+            password='12345'
+        )
+
+        cls.other_user2 = User.objects.create_superuser(
+            username='superuser1',
+            password='12345',
+            email='super@example.com'
+        )
+
+        cls.factory = APIRequestFactory()
+
+    def setUp(self):
+        self.login = self.client.login(
+            username='testuser1',
+            password='12345'
+        )
+
+        self.valid_payload1 = {
+            'username': 'testuser1000',
+            'password': '12345',
+        }
+
+        self.invalid_payload1 = {
+            'username': '',
+            'password': '12345',
+        }
+
+        self.invalid_payload2 = {
+            'username': 'Testuser1000',
+            'password': '',
+        }
+
+        self.questionable_payload1 = {
+            'username': 'testuser1000',
+            'password': '12345',
+            'is_staff': True,
+        }
+
+        self.questionable_payload2 = {
+            'username': 'testuser1000',
+            'password': '12345',
+            'is_active': True
+        }
+
+        self.questionable_payload3 = {
+            'username': 'testuser1000',
+            'password': '12345',
+            'date_joined': timezone.now() + timezone.timedelta(days=1),
+        }
+
+    def test_get_all_users(self):
+        test_url = reverse('user-list')
+        request = self.factory.get(test_url)
+        response = self.client.get(test_url)
+        # get data from db
+        users = User.objects.all()
+        serializer = UserSerializer(
+            users,
+            context={'request': request},
+            many=True
+        )
+
+        response_set = set(t['id'] for t in response.data)
+        all_users = set(t['id'] for t in serializer.data)
+
+        # Check that the returned user list only contains the current user
+        # and not any other users in the database
+        set_diff = all_users.difference(response_set)
+
+        self.assertEqual(len(set_diff), len(users) - 1)
+        self.assertEqual(
+            set_diff.difference({self.other_user1.id, self.other_user2.id}),
+            set()
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+    def test_get_all_users_as_superuser(self):
+        test_url = reverse('user-list')
+        self.client.logout()
+        self.client.login(
+            username='superuser1',
+            password='12345'
+        )
+        request = self.factory.get(test_url)
+        response = self.client.get(test_url)
+        # get data from db
+        users = User.objects.all()
+        serializer = UserSerializer(
+            users,
+            context={'request': request},
+            many=True
+        )
+
+        response_set = set(t['id'] for t in response.data)
+        all_users = set(t['id'] for t in serializer.data)
+
+        # Check that the returned user list only contains the current user
+        # and not any other users in the database
+        set_diff = all_users.difference(response_set)
+
+        self.assertEqual(len(set_diff), len(users) - 1)
+        self.assertEqual(
+            set_diff.difference({self.user.id, self.other_user1.id}),
+            set()
+            )
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+    def test_get_one_user(self):
+        test_pk = self.user.pk
+        test_url = reverse('user-detail', kwargs={'pk': test_pk})
+        request = self.factory.get(test_url)
+        response = self.client.get(test_url)
+        # get data from db
+        user = User.objects.get(pk=test_pk)
+        serializer = UserSerializer(
+            user,
+            context={'request': request}
+        )
+
+        self.assertEqual(
+            response.data,
+            serializer.data
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+    def test_get_one_user_invalid(self):
+        # Attempt to get nonexistent user
+        max_id = User.objects.all()\
+            .aggregate(max_id=Max(F('id')))\
+            .get('max_id', None)
+        test_pk = max_id + 1
+        test_url = reverse('user-detail', kwargs={'pk': test_pk})
+        response = self.client.get(test_url)
+
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_get_other_user(self):
+        # Try to access another user's user
+        test_pk = self.other_user1.pk
+        test_url = reverse('user-detail', kwargs={'pk': test_pk})
+        response = self.client.get(test_url)
+
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_get_all_users_unauthenticated(self):
+        # Try user listing while unauthenticated
+        self.client.logout()
+        test_url = reverse('user-list')
+        response = self.client.get(test_url)
+
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+    def test_get_one_user_unauthenticated(self):
+        # Try user listing while unauthenticated
+        test_pk = self.user.pk
+        self.client.logout()
+        test_url = reverse('user-detail', kwargs={'pk': test_pk})
+        response = self.client.get(test_url)
+
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+    def test_create_user(self):
+        test_url = reverse('user-list')
+        response = self.client.post(
+            test_url,
+            data=self.valid_payload1
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+
+    def test_create_user_invalid1(self):
+        test_url = reverse('user-list')
+        response = self.client.post(
+            test_url,
+            data=self.invalid_payload1
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_create_user_invalid2(self):
+        test_url = reverse('user-list')
+        response = self.client.post(
+            test_url,
+            data=self.invalid_payload2
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_create_user_unauthenticated(self):
+        self.client.logout()
+        test_url = reverse('user-list')
+        response = self.client.post(
+            test_url,
+            data=self.valid_payload1
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+    def test_create_user_questionable1(self):
+        test_url = reverse('user-list')
+        response = self.client.post(
+            test_url,
+            data=self.questionable_payload1
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+
+    def test_create_user_questionable2(self):
+        test_url = reverse('user-list')
+        response = self.client.post(
+            test_url,
+            data=self.questionable_payload2
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+
+    def test_create_user_questionable3(self):
+        test_url = reverse('user-list')
+        response = self.client.post(
+            test_url,
+            data=self.questionable_payload3
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+
+    def test_update_user(self):
+        test_pk = self.user.pk
+        test_url = reverse('user-detail', kwargs={'pk': test_pk})
+
+        response = self.client.put(
+            test_url,
+            data=self.valid_payload1
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+    def test_update_other_user(self):
+        test_pk = self.other_user1.pk
+        test_url = reverse('user-detail', kwargs={'pk': test_pk})
+
+        response = self.client.put(
+            test_url,
+            data=self.valid_payload1
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_update_user_unauthenticated(self):
+        self.client.logout()
+        test_pk = self.user.pk
+        test_url = reverse('user-detail', kwargs={'pk': test_pk})
+
+        response = self.client.put(
+            test_url,
+            data=self.valid_payload1
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+    def test_update_user_questionable1(self):
+        test_pk = self.user.pk
+        test_url = reverse('user-detail', kwargs={'pk': test_pk})
+
+        response = self.client.put(
+            test_url,
+            data=self.questionable_payload1
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+    def test_delete_user(self):
+        test_pk = self.user.pk
+        test_url = reverse('user-detail', kwargs={'pk': test_pk})
+
+        response = self.client.delete(
+            test_url
+        )
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
