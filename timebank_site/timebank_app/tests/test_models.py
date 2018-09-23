@@ -1,6 +1,5 @@
 from django.db import DataError, transaction
 from django.test import TestCase
-from django.utils import timezone
 
 from timebank_app.models import (
     User,
@@ -233,7 +232,10 @@ class TaskModelTest(TestCase):
 # Check string representation
     def test__str__method(self):
         string_rep = self.task.__str__()
-        self.assertEqual(string_rep, '1: TEST')
+        self.assertEqual(
+            string_rep,
+            '{}: {}'.format(self.task.pk, self.task.task_name)
+        )
 
 # Check character limits
     def test_task_name_length_lt(self):

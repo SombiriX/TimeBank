@@ -32,11 +32,6 @@ class UserSerializerTest(TestCase):
             password='12345'
         )
 
-        self.serializer_data = {
-            'task_name': 'TASK NAME',
-            'time_budget': 600,
-        }
-
         self.test_user = User.objects.all()[0]
         self.request = self.factory.get('/some_path')
         self.serializer = UserSerializer(
@@ -138,11 +133,6 @@ class TaskSerializerTest(TestCase):
             'task_notes': 'BlahBlahBlahBlah',
             'task_type': 'D',
             'time_budget': 3600,
-        }
-
-        self.serializer_data = {
-            'task_name': 'TASK NAME',
-            'time_budget': 600,
         }
 
         self.task = Task.objects.create(**self.task_attributes)
@@ -255,11 +245,11 @@ class TaskSerializerTest(TestCase):
     def test_task_running(self):
         running_task = Task.objects.create(**self.task_attributes)
 
-        serializer1 = TaskSerializer(
+        data1 = TaskSerializer(
             instance=running_task,
             context={'request': self.request}
-        )
-        data1 = serializer1.data
+        ).data
+
         right_now = timezone.now()
         an_hour_ago = right_now - timezone.timedelta(hours=1)
         thirty_mins_ago = right_now - timezone.timedelta(minutes=30)
@@ -278,10 +268,10 @@ class TaskSerializerTest(TestCase):
         running_task.running = True
         running_task.save()
 
-        serializer2 = TaskSerializer(
+        data2 = TaskSerializer(
             instance=running_task,
-            context={'request': self.request})
-        data2 = serializer2.data
+            context={'request': self.request}
+        ).data
 
         # Assert that time delta is within 1 second of 45 minutes
         self.assertAlmostEqual(
@@ -309,9 +299,9 @@ class TaskSerializerTest(TestCase):
         running_task.running = False
         running_task.save()
 
-        serializer3 = TaskSerializer(
+        data3 = TaskSerializer(
             instance=running_task,
-            context={'request': self.request})
-        data3 = serializer3.data
+            context={'request': self.request}
+        ).data
 
         self.assertIsNone(data3['running_interval'])
