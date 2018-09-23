@@ -16,13 +16,6 @@ from timebank_app.serializers import (
     IntervalSerializer,
 )
 
-from timebank_app.viewsets import (
-    IntervalViewSet,
-    TaskViewSet,
-    UserViewSet,
-)
-
-
 class TaskViewSetTest(APITestCase):
     # pylint: disable=too-many-instance-attributes
     # instances are necessary for testing
@@ -466,9 +459,7 @@ class IntervalViewSetTest(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
     def test_create_interval_invalid(self):
-        #TODO break this up
         test_url = reverse('interval-list')
-
         response = self.client.post(
             test_url,
             data=self.invalid_payload1
@@ -476,6 +467,8 @@ class IntervalViewSetTest(APITestCase):
 
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
+    def test_create_interval_invalid2(self):
+        test_url = reverse('interval-list')
         response = self.client.post(
             test_url,
             data=self.invalid_payload2
@@ -483,6 +476,8 @@ class IntervalViewSetTest(APITestCase):
 
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
+    def test_create_interval_invalid3(self):
+        test_url = reverse('interval-list')
         response = self.client.post(
             test_url,
             data=self.invalid_payload3
@@ -490,6 +485,8 @@ class IntervalViewSetTest(APITestCase):
 
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
+    def test_create_interval_invalid4(self):
+        test_url = reverse('interval-list')
         response = self.client.post(
             test_url,
             data=self.invalid_payload4
@@ -497,6 +494,8 @@ class IntervalViewSetTest(APITestCase):
 
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
+    def test_create_interval_invalid5(self):
+        test_url = reverse('interval-list')
         response = self.client.post(
             test_url,
             data=self.invalid_payload5
@@ -504,6 +503,8 @@ class IntervalViewSetTest(APITestCase):
 
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
+    def test_create_interval_invalid6(self):
+        test_url = reverse('interval-list')
         response = self.client.post(
             test_url,
             data=self.invalid_payload6

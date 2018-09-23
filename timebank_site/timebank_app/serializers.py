@@ -65,8 +65,7 @@ class TaskSerializer(ModelSerializer):
         return int(round(ret.total_seconds()))
 
     def get_validation_exclusions(self, *args, **kwargs):
-        # exclude the author field as we supply it later on in the
-        # corresponding view based on the http request
+        # exclude the author field since it's supplied in view later
         exclusions = super(
             TaskSerializer, self).get_validation_exclusions(*args, **kwargs)
         return exclusions + ['author']
