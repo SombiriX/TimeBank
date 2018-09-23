@@ -73,7 +73,6 @@ class TaskSerializer(ModelSerializer):
 
     def validate(self, attrs):
         # Verify that required fields are properly formatted
-        # TODO remove fields which should not be set manually eg 'running'
         t_name = attrs.get('task_name', None)
         t_budget = attrs.get('time_budget', None)
 
@@ -83,6 +82,19 @@ class TaskSerializer(ModelSerializer):
             raise ValidationError(
                 'Time budget should be integer seconds'
             )
+
+        # Remove unsettable attribute values if provided
+        if 'running' in attrs.keys():
+            del attrs['running']
+        if 'author' in attrs.keys():
+            del attrs['author']
+        if 'intervals' in attrs.keys():
+            del attrs['intervals']
+        if 'running_interval' in attrs.keys():
+            del attrs['running_interval']
+        if 'runtime' in attrs.keys():
+            del attrs['runtime']
+
         return attrs
 
     class Meta:
