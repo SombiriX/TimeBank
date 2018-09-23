@@ -19,6 +19,20 @@ class UserSerializer(ModelSerializer):
 
     tasks = HyperlinkedIdentityField(view_name='user-tasks')
 
+    def validate(self, attrs):
+        if self.initial_data.get('password', None) in ('', None):
+            raise ValidationError("Blank passwords are not allowed")
+
+        # Remove unsettable attribute values if provided
+        if 'is_staff' in attrs.keys():
+            del attrs['is_staff']
+        if 'is_active' in attrs.keys():
+            del attrs['is_active']
+        if 'date_joined' in attrs.keys():
+            del attrs['date_joined']
+
+        return attrs
+
     class Meta:
         model = User
         fields = (
