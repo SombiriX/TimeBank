@@ -10,6 +10,8 @@ class AppView(TemplateView):
 
     @method_decorator(ensure_csrf_cookie)
     def get(self, request):
+        # pylint: disable=W0221
+        # *args **kwargs ar not used
         return render(request, 'index.html', context=None)
 
 
@@ -21,6 +23,7 @@ def current_user(request):
         "twentyFourClock": getattr(user, 'twentyFourClock', None),
     }
     return Response({
+        "id": user.id,
         "username": getattr(user, 'username', None),
         "first_name": getattr(user, 'first_name', None),
         "last_name": getattr(user, 'last_name', None),

@@ -103,6 +103,7 @@ class IntervalViewSet(ModelViewSet):
         return super(IntervalViewSet, self).perform_create(serializer)
 
     def perform_update(self, serializer):
+        # eg. raise ValidationError("Invalid dates")
         # Set the interval's task to stopped
         task = serializer.validated_data['task']
         task.running = False

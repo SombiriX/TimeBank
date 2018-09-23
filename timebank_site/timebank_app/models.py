@@ -30,6 +30,7 @@ class Task(Model):
     task_name = CharField(
         max_length=115,
         default='',
+        blank=False,
     )
     task_notes = TextField(blank=True)
     parent_task = ForeignKey(
