@@ -75,8 +75,32 @@ class TaskViewSetTest(APITestCase):
             author=self.other_user
         )
 
+        self.valid_payload1 = {
+            'task_name': 'valid task',
+            'time_budget': 4,
+        }
+
+        self.valid_payload2 = {
+            'task_name': 'valid task',
+        }
+
+        self.invalid_payload1 = {
+            'task_name': '',
+            'time_budget': 4,
+        }
+
+        self.invalid_payload2 = {
+        }
+
+        self.invalid_payload3 = {
+            'time_budget': 4,
+        }
+
+        self.invalid_payload4 = {
+            'time_budget': '',
+        }
+
     def test_get_all_tasks(self):
-        # get API response
         test_url = reverse('task-list')
         request = self.factory.get(test_url)
         response = self.client.get(test_url)
@@ -88,14 +112,19 @@ class TaskViewSetTest(APITestCase):
             many=True
         )
 
-        self.assertEqual(
-            set(json.dumps(response.data)),
-            set(json.dumps(serializer.data))
-        )
+        response_set = set(t['id'] for t in response.data)
+        all_tasks = set(t['id'] for t in serializer.data)
+
+        # Check that the returned task list only contains tasks which
+        # belong to the user who requested them
+        set_diff = all_tasks.difference(response_set)
+
+        self.assertEqual(len(set_diff), 1)
+        self.assertEqual(set_diff.pop(), self.other_user_task.id)
+
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
     def test_get_one_task(self):
-        # get API response
         test_pk = self.task1.pk
         test_url = reverse('task-detail', kwargs={'pk': test_pk})
         request = self.factory.get(test_url)
@@ -114,7 +143,7 @@ class TaskViewSetTest(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
     def test_get_one_task_invalid(self):
-        # get API response
+        # Attempt to get nonexistent task
         max_id = Task.objects.all()\
             .aggregate(max_id=Max(F('id')))\
             .get('max_id', None)
@@ -125,7 +154,7 @@ class TaskViewSetTest(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
     def test_get_other_user_task(self):
-        # get API response
+        # Try to access another user's task
         test_pk = self.other_user_task.pk
         test_url = reverse('task-detail', kwargs={'pk': test_pk})
         response = self.client.get(test_url)
@@ -133,21 +162,133 @@ class TaskViewSetTest(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
     def test_get_all_tasks_unauthenticated(self):
-        # get API response
+        # Try task listing while unauthenticated
         self.client.logout()
         test_url = reverse('task-list')
         response = self.client.get(test_url)
 
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
+    def test_get_one_task_unauthenticated(self):
+        # Try task listing while unauthenticated
+        test_pk = self.task1.pk
+        self.client.logout()
+        test_url = reverse('task-detail', kwargs={'pk': test_pk})
+        response = self.client.get(test_url)
+
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
     def test_create_task(self):
-        # TODO
-        pass
+        test_url = reverse('task-list')
+        response = self.client.post(
+            test_url,
+            data=self.valid_payload1
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+
+        response = self.client.post(
+            test_url,
+            data=self.valid_payload2
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+
+    def test_create_task_unauthenticated(self):
+        self.client.logout()
+        test_url = reverse('task-list')
+        response = self.client.post(
+            test_url,
+            data=self.valid_payload1
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+    def test_create_task_invalid(self):
+        test_url = reverse('task-list')
+
+        response = self.client.post(
+            test_url,
+            data=self.invalid_payload1
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+        response = self.client.post(
+            test_url,
+            data=self.invalid_payload2
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+        response = self.client.post(
+            test_url,
+            data=self.invalid_payload3
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+        response = self.client.post(
+            test_url,
+            data=self.invalid_payload4
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_update_task(self):
-        # TODO
-        pass
+        test_pk = self.task1.pk
+        test_url = reverse('task-detail', kwargs={'pk': test_pk})
+
+        response = self.client.put(
+            test_url,
+            data=self.valid_payload1
+        )
+
+        for (k, v) in self.valid_payload1.items():
+            self.assertEqual(v, response.data[k])
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+    def test_update_other_user_task(self):
+        test_pk = self.other_user_task.pk
+        test_url = reverse('task-detail', kwargs={'pk': test_pk})
+
+        response = self.client.put(
+            test_url,
+            data=self.valid_payload1
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_update_task_unauthenticated(self):
+        self.client.logout()
+        test_pk = self.task1.pk
+        test_url = reverse('task-detail', kwargs={'pk': test_pk})
+
+        response = self.client.put(
+            test_url,
+            data=self.valid_payload1
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+    def test_update_task_invalid(self):
+        test_pk = self.task1.pk
+        test_url = reverse('task-detail', kwargs={'pk': test_pk})
+
+        response = self.client.put(
+            test_url,
+            data=self.invalid_payload1
+        )
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_delete_task(self):
-        # TODO
-        pass
+        test_pk = self.task1.pk
+        test_url = reverse('task-detail', kwargs={'pk': test_pk})
+
+        response = self.client.delete(
+            test_url
+        )
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+
+        response = self.client.get(test_url)
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
