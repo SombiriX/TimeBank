@@ -92,7 +92,7 @@ class UserModelTest(TestCase):
             password='12345'
         )
 
-# Check field labels
+    # Check field labels
     def test_twentyFourClock_label(self):
         #pylint: disable=W0212
         self.assertEqual(
@@ -118,7 +118,7 @@ class UserModelTest(TestCase):
             'last modified'
         )
 
-# check default values
+    # check default values
     def test_defaults(self):
         self.assertEqual(self.user.twentyFourClock, False)
         self.assertEqual(self.user.complete_anim, 0)
@@ -155,7 +155,7 @@ class TaskModelTest(TestCase):
             author=self.user
         )
 
-# Check field labels
+    # Check field labels
     def test_task_name_label(self):
         #pylint: disable=W0212
         self.assertEqual(
@@ -229,7 +229,7 @@ class TaskModelTest(TestCase):
             'author'
         )
 
-# Check string representation
+    # Check string representation
     def test__str__method(self):
         string_rep = self.task.__str__()
         self.assertEqual(
@@ -237,7 +237,7 @@ class TaskModelTest(TestCase):
             '{}: {}'.format(self.task.pk, self.task.task_name)
         )
 
-# Check character limits
+    # Check character limits
     def test_task_name_length_lt(self):
         self.task.task_name = self.valid_name_lt
         try:
