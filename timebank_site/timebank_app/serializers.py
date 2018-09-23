@@ -95,14 +95,18 @@ class IntervalSerializer(ModelSerializer):
     def validate(self, attrs):
         # Ensure stop time is after start time and
         # both start / stop times are in the past or present
+        i_start = attrs.get('start', None)
+        i_stop = attrs.get('stop', None)
+        has_stop = i_stop is not None
+
         right_now = timezone.now()
-        if not isinstance(attrs['start'], timezone.datetime):
+        if not isinstance(i_start, timezone.datetime):
             raise ValidationError('Invalid start value')
-        if not isinstance(attrs['stop'], timezone.datetime):
+        if has_stop and not isinstance(i_stop, timezone.datetime):
             raise ValidationError('Invalid stop value')
-        if attrs['stop'] < attrs['start']:
+        if has_stop and i_stop < i_start:
             raise ValidationError('Stop time should be after start time')
-        if attrs['start'] > right_now or attrs['start'] > right_now:
+        if i_start > right_now or (has_stop and i_stop > right_now):
             raise ValidationError('Times should be in the past or present')
         return attrs
 
