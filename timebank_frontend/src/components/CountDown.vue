@@ -14,6 +14,7 @@
 <script>
 // TODO handle pause unpause remaining time
 export default {
+  name: 'CountDown',
   props: {
     twentyFourClock: {
       type: Boolean,
