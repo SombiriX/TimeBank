@@ -110,8 +110,7 @@ export default {
 
         if (this.secondsLeft === 0) {
           // Countdown complete, display overage counter (count up)
-          // this.endTime = 0
-          // this.timeLeft = '00:00'
+
           this.$emit('countDownComplete')
           this.overTime = true
         }

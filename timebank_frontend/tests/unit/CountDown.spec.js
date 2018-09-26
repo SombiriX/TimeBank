@@ -179,7 +179,6 @@ describe('CountDown.vue', function () {
   })
 
   it('Can be paused and unpaused', function () {
-    this.timeout(5000)
     const data = {
       twentyFourClock: false,
       initialTime: 60,
@@ -214,5 +213,58 @@ describe('CountDown.vue', function () {
 
     this.clock.tick(10000)
     expect(wrapper.text()).to.include(timerText.unpaused2)
+  })
+
+  it('Emits an event for each tick', function () {
+    const data = {
+      twentyFourClock: false,
+      initialTime: 60,
+      elapsedTime: 0,
+      running: false,
+      paused: false
+    }
+
+    const wrapper = shallowMount(CountDown, {
+      propsData: data
+    })
+
+    // Check with overage time
+    wrapper.setProps({
+      running: true
+    })
+    this.clock.tick(5000)
+    const emmisssions = wrapper.emitted().countDownTick
+
+    // Countdown setup code calls displaytime which triggers event,
+    // The event then fires once/ second afterwards
+    expect(emmisssions.length).to.equal(1 + 5)
+    expect(emmisssions[0][0]).to.have.all.keys('secondsLeft', 'overTime')
+    expect(emmisssions[1][0]).to.have.all.keys('secondsLeft', 'overTime')
+    expect(emmisssions[2][0]).to.have.all.keys('secondsLeft', 'overTime')
+    expect(emmisssions[3][0]).to.have.all.keys('secondsLeft', 'overTime')
+    expect(emmisssions[4][0]).to.have.all.keys('secondsLeft', 'overTime')
+  })
+
+  it('Emits an event when complete', function () {
+    const data = {
+      twentyFourClock: false,
+      initialTime: 5,
+      elapsedTime: 0,
+      running: false,
+      paused: false
+    }
+
+    const wrapper = shallowMount(CountDown, {
+      propsData: data
+    })
+
+    // Check with overage time
+    wrapper.setProps({
+      running: true
+    })
+    this.clock.tick(6000)
+    const emmisssions = wrapper.emitted().countDownComplete
+
+    expect(emmisssions.length).to.equal(1)
   })
 })
