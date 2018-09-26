@@ -19,8 +19,22 @@
         <v-btn v-else flat to="/login">Login</v-btn>
         <v-btn v-if="isAuthenticated" flat to="/timebank">Goto Time Bank</v-btn>
       </v-toolbar>
-      <router-view/>
+      <router-view @appAlert="handleAlert"/>
     </v-content>
+    <v-snackbar
+    :color="alert.type"
+    v-model="alert.status"
+    multi-line
+    top
+    >
+     {{ alert.msg }}
+      <v-btn
+        flat
+        @click="alert.status = false"
+      >
+        Close
+      </v-btn>
+    </v-snackbar>
     <v-footer :fixed="fixed" app>
       <span>&copy; 2018
         <a href="https://github.com/SombiriX/TimeBank">
@@ -38,12 +52,24 @@ export default {
   data () {
     return {
       fixed: false,
-      title: 'Time Bank'
+      title: 'Time Bank',
+      alert: {
+        status: false,
+        msg: '',
+        type: 'info'
+      }
     }
   },
   computed: {
     isAuthenticated: function () {
       return this.$store.getters['auth/isAuthenticated']
+    }
+  },
+  methods: {
+    handleAlert: function (msg) {
+      this.alert.type = msg.type ? msg.type : 'info'
+      this.alert.msg = msg.msg ? msg.msg : ''
+      this.alert.status = true
     }
   }
 }
