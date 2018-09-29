@@ -58,7 +58,13 @@
             </v-text-field>
             <v-container grid-list-md text-xs-center>
               <v-layout row align-center justify-center>
-                <v-btn flat type='submit'>create account</v-btn>
+                <v-btn
+                  flat
+                  type='submit'
+                  ref="createAccBtn"
+                >
+                  create account
+                </v-btn>
               </v-layout>
               <v-layout row>
                 <v-flex xs4>
@@ -120,7 +126,7 @@ export default {
         const msg = 'Registration complete, check your email\n'
         const type = 'success'
         this.$emit('appAlert', { msg: msg, type: type })
-        this.$store.dispatch('signup/clearRegistrationStatus')
+        this.clearRegistrationStatus()
       }
     },
     registrationError (val) {
@@ -130,7 +136,7 @@ export default {
         )
         const type = 'error'
         this.$emit('appAlert', { msg: msg, type: type })
-        this.$store.dispatch('signup/clearRegistrationStatus')
+        this.clearRegistrationStatus()
       }
     }
   },
@@ -160,11 +166,15 @@ export default {
       },
       pass1Errors () {
         const errors = []
+        let confirmPass = this.inputs.password2
+        let otherPass = this.inputs.password1
         if (!this.$v.inputs.password1.$dirty) return errors
         !this.$v.inputs.password1.minLength && errors.push(
           'At least 8 characters required')
         !this.$v.inputs.password1.required && errors.push(
           'Password is required.')
+        !(confirmPass === otherPass) && errors.push(
+          'Passwords do not match')
         return errors
       },
       pass2Errors () {
@@ -197,6 +207,7 @@ export default {
     {
       submit: function () {
         // Validate inputs and login
+        console.log('[submit]', this)
         this.$v.$touch()
         if (!this.$v.$invalid) {
           let inputs = this.inputs
