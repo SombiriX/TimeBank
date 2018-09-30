@@ -1,65 +1,32 @@
 import { expect } from 'chai'
-import { mount, createLocalVue } from '@vue/test-utils'
+import { shallowMount, createLocalVue } from '@vue/test-utils'
 import Vuex from 'vuex'
 import VueRouter from 'vue-router'
-import '../../src/plugins/vuetify'
+// import '../../src/plugins/vuetify'
+import Vuetify from 'vuetify'
 import sinon from 'sinon'
 import Register from '@/views/Register.vue'
 
-const localVue = createLocalVue()
-localVue.use(Vuex)
-localVue.use(VueRouter)
-
 describe('Register.vue', function () {
   // Mock up some testing functions and data
+  let wrapper
   let actions
+  let modules
+  let signup
   let state
   let store
 
-  // Stores whether each function has been called
-  let fnStatus = {
-    createAccount: false,
-    clearRegistrationStatus: false
-  }
-
-  // Mock Vuex functions
-  let createInput
-  function setStateSuccess (state) {
-    state.registrationCompleted = true
-  }
-  function setStateFail (state) {
-    state.registrationError = true
-  }
-  function createFnSuccess ({ commit }, input) {
-    console.log('[createFnSuccess]', this)
-    fnStatus.createAccount = true
-    createInput = { ...input }
-    commit(setStateSuccess)
-  }
-  function createFnFail ({ commit }, input) {
-    fnStatus.createAccount = true
-    createInput = { ...input }
-    commit(setStateFail)
-  }
-
-  function clearFn () {
-    fnStatus.clearRegistrationStatus = true
-  }
-
-  const validData = {
-    username: 'TEST',
-    password1: 'qweasdzx',
-    password2: 'qweasdzx',
-    email: 'test@example.com'
-  }
-  const invalidData = {
-    username: 'TEST',
-    password1: 'qweasdz',
-    password2: 'qweasdz',
-    email: 'test@example'
-  }
+  const routes = [
+    { path: '/login', name: 'login' }
+  ]
+  const router = new VueRouter({ routes })
 
   beforeEach(function () {
+    const localVue = createLocalVue()
+    localVue.use(Vuex)
+    localVue.use(VueRouter)
+    localVue.use(Vuetify)
+
     state = {
       registrationCompleted: false,
       registrationError: false,
@@ -72,33 +39,40 @@ describe('Register.vue', function () {
       clearRegistrationStatus: sinon.stub()
     }
 
-    store = new Vuex.Store({
-      modules: {
-        signup: {
-          namespaced: true,
-          state: state,
-          actions: actions
-        }
-      }
+    signup = {
+      namespaced: true,
+      state,
+      actions
+    }
+
+    modules = { signup }
+
+    store = new Vuex.Store({ modules })
+
+    wrapper = shallowMount(Register, {
+      localVue: localVue,
+      store,
+      router
     })
   })
 
   it('Emits success alert on valid user creation', function () {
-    const wrapper = mount(Register, { store, localVue })
     // Set valid data
-    wrapper.setData({
-      inputs: {
-        username: validData.username,
-        password1: validData.password1,
-        password2: validData.password2,
-        email: validData.email
-      }
-    })
+    // wrapper.setData({
+    //   inputs: {
+    //     username: validData.username,
+    //     password1: validData.password1,
+    //     password2: validData.password2,
+    //     email: validData.email
+    //   }
+    // })
 
     // Cause submission
-    let btn = wrapper.find({ ref: 'createAccBtn' })
+    let btn = wrapper.find({ ref: 'registerForm' })
+    let inputs = wrapper.findAll('input')
+    console.log('[inputs]', wrapper.html())
     expect(btn).to.exist
-    btn.trigger('click')
+    btn.trigger('submit.prevent')
 
     // Expect component to trigger state actions
     // expect(fnStatus.createAccount).to.be.true
