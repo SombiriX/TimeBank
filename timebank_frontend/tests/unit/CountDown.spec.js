@@ -1,4 +1,3 @@
-import { expect } from 'chai'
 import lolex from 'lolex'
 import { shallowMount } from '@vue/test-utils'
 import '../../src/plugins/vuetify'
@@ -37,7 +36,7 @@ describe('CountDown.vue', function () {
     const wrapper = shallowMount(CountDown, {
       propsData: data
     })
-    expect(wrapper.text()).to.include(timerText.default)
+    expect(wrapper.text()).toContain(timerText.default)
   })
 
   it('Sets initial time while running', function (done) {
@@ -59,7 +58,7 @@ describe('CountDown.vue', function () {
     })
 
     wrapper.vm.$nextTick(() => {
-      expect(wrapper.text()).to.include(timerText.initial)
+      expect(wrapper.text()).toContain(timerText.initial)
       done()
     })
   })
@@ -84,7 +83,7 @@ describe('CountDown.vue', function () {
     })
 
     wrapper.vm.$nextTick(() => {
-      expect(wrapper.text()).to.include(timerText.elapsed)
+      expect(wrapper.text()).toContain(timerText.elapsed)
       done()
     })
   })
@@ -109,7 +108,7 @@ describe('CountDown.vue', function () {
     })
 
     wrapper.vm.$nextTick(() => {
-      expect(wrapper.text()).to.include(timerText.overtime)
+      expect(wrapper.text()).toContain(timerText.overtime)
       done()
     })
   })
@@ -141,7 +140,7 @@ describe('CountDown.vue', function () {
     })
 
     wrapper.vm.$nextTick(() => {
-      expect(wrapper.text()).to.include(timerText.twentyFourTime)
+      expect(wrapper.text()).toContain(timerText.twentyFourTime)
       done()
     })
   })
@@ -173,7 +172,7 @@ describe('CountDown.vue', function () {
     })
 
     wrapper.vm.$nextTick(() => {
-      expect(wrapper.text()).to.include(timerText.regTime)
+      expect(wrapper.text()).toContain(timerText.regTime)
       done()
     })
   })
@@ -196,23 +195,23 @@ describe('CountDown.vue', function () {
       running: true
     })
     this.clock.tick(500)
-    expect(wrapper.text()).to.include(timerText.initial)
+    expect(wrapper.text()).toContain(timerText.initial)
     this.clock.tick(1000)
-    expect(wrapper.text()).to.include(timerText.unpaused1)
+    expect(wrapper.text()).toContain(timerText.unpaused1)
 
     wrapper.setProps({
       paused: true
     })
 
     this.clock.tick(5000)
-    expect(wrapper.text()).to.include(timerText.unpaused1)
+    expect(wrapper.text()).toContain(timerText.unpaused1)
 
     wrapper.setProps({
       paused: false
     })
 
     this.clock.tick(10000)
-    expect(wrapper.text()).to.include(timerText.unpaused2)
+    expect(wrapper.text()).toContain(timerText.unpaused2)
   })
 
   it('Emits an event for each tick', function () {
@@ -237,12 +236,12 @@ describe('CountDown.vue', function () {
 
     // Countdown setup code calls displaytime which triggers event,
     // The event then fires once/ second afterwards
-    expect(emmisssions.length).to.equal(1 + 5)
-    expect(emmisssions[0][0]).to.have.all.keys('secondsLeft', 'overTime')
-    expect(emmisssions[1][0]).to.have.all.keys('secondsLeft', 'overTime')
-    expect(emmisssions[2][0]).to.have.all.keys('secondsLeft', 'overTime')
-    expect(emmisssions[3][0]).to.have.all.keys('secondsLeft', 'overTime')
-    expect(emmisssions[4][0]).to.have.all.keys('secondsLeft', 'overTime')
+    expect(emmisssions.length).toBe(1 + 5)
+    expect(emmisssions[0][0]).toEqual(expect.arrayContaining(['secondsLeft', 'overTime']))
+    expect(emmisssions[1][0]).toEqual(expect.arrayContaining(['secondsLeft', 'overTime']))
+    expect(emmisssions[2][0]).toEqual(expect.arrayContaining(['secondsLeft', 'overTime']))
+    expect(emmisssions[3][0]).toEqual(expect.arrayContaining(['secondsLeft', 'overTime']))
+    expect(emmisssions[4][0]).toEqual(expect.arrayContaining(['secondsLeft', 'overTime']))
   })
 
   it('Emits an event when complete', function () {
@@ -265,6 +264,6 @@ describe('CountDown.vue', function () {
     this.clock.tick(6000)
     const emmisssions = wrapper.emitted().countDownComplete
 
-    expect(emmisssions.length).to.equal(1)
+    expect(emmisssions.length).toBe(1)
   })
 })
