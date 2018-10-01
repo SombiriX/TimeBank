@@ -81,6 +81,13 @@ export default {
           this._countUp()
         }
       }
+    },
+    twentyFourClock: function (value) {
+      if (value) {
+        this.dummy24Hr = true
+      } else {
+        this.dummy24Hr = false
+      }
     }
   },
   methods: {
