@@ -1,13 +1,15 @@
-import { expect } from 'chai'
-import { shallowMount, createLocalVue } from '@vue/test-utils'
+import { mount, createLocalVue } from '@vue/test-utils'
 import Vuex from 'vuex'
 import VueRouter from 'vue-router'
-// import '../../src/plugins/vuetify'
 import Vuetify from 'vuetify'
-import sinon from 'sinon'
 import Register from '@/views/Register.vue'
 
-describe('Register.vue', function () {
+describe('Register.vue', () => {
+  const localVue = createLocalVue()
+  localVue.use(Vuex)
+  localVue.use(VueRouter)
+  localVue.use(Vuetify)
+
   // Mock up some testing functions and data
   let wrapper
   let actions
@@ -16,17 +18,25 @@ describe('Register.vue', function () {
   let state
   let store
 
+  const validData = {
+    username: 'TEST',
+    password1: 'qweasdzx',
+    password2: 'qweasdzx',
+    email: 'test@example.com'
+  }
+  const invalidData = {
+    username: 'TEST',
+    password1: 'qweasdz',
+    password2: 'qweasdz',
+    email: 'test@example'
+  }
+
   const routes = [
     { path: '/login', name: 'login' }
   ]
   const router = new VueRouter({ routes })
 
-  beforeEach(function () {
-    const localVue = createLocalVue()
-    localVue.use(Vuex)
-    localVue.use(VueRouter)
-    localVue.use(Vuetify)
-
+  beforeEach(() => {
     state = {
       registrationCompleted: false,
       registrationError: false,
@@ -35,8 +45,8 @@ describe('Register.vue', function () {
     }
 
     actions = {
-      createAccount: sinon.stub(),
-      clearRegistrationStatus: sinon.stub()
+      createAccount: function () {state.registrationCompleted = true},
+      clearRegistrationStatus: jest.fn()
     }
 
     signup = {
@@ -49,43 +59,39 @@ describe('Register.vue', function () {
 
     store = new Vuex.Store({ modules })
 
-    wrapper = shallowMount(Register, {
+    wrapper = mount(Register, {
       localVue: localVue,
       store,
       router
     })
   })
 
-  it('Emits success alert on valid user creation', function () {
+  test('Calls createAccount on user submit', () => {
     // Set valid data
-    // wrapper.setData({
-    //   inputs: {
-    //     username: validData.username,
-    //     password1: validData.password1,
-    //     password2: validData.password2,
-    //     email: validData.email
-    //   }
-    // })
+    wrapper.setData({
+      inputs: {
+        username: validData.username,
+        password1: validData.password1,
+        password2: validData.password2,
+        email: validData.email
+      }
+    })
 
     // Cause submission
     let btn = wrapper.find({ ref: 'registerForm' })
-    let inputs = wrapper.findAll('input')
-    console.log('[inputs]', wrapper.html())
-    expect(btn).to.exist
+    expect(btn).toBeDefined()
     btn.trigger('submit.prevent')
 
     // Expect component to trigger state actions
-    // expect(fnStatus.createAccount).to.be.true
-    expect(actions.createAccount.calledOnce).to.be.true
-
-    // State response should occur automatically with mocked functions
+    expect(wrapper.vm.registrationCompleted).toBe(true)
 
     // Expect success emission
-    const emmisssions = wrapper.emitted().appAlert
-    expect(emmisssions.length).to.equal(1 + 1)
-    expect(emmisssions[0][0]).to.have.all.keys('msg', 'type')
+    const emissions = wrapper.emitted().appAlert
+    expect(emissions.length).toBe(1)
+    const msg = 'Registration complete, check your email\n'
+    expect(emissions[0][0]).toMatchObject({'msg': msg, 'type': 'success'})
 
     // Expect cleanup action
-    expect(actions.signup.clearRegistrationStatus).toHaveBeenCalled()
+    expect(actions.clearRegistrationStatus).toHaveBeenCalled()
   })
 })

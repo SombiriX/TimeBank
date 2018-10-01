@@ -198,17 +198,17 @@ describe('CountDown.vue', function () {
     wrapper.setProps(data)
 
     clock.tick(5000)
-    const emmisssions = wrapper.emitted().countDownTick
+    const emissions = wrapper.emitted().countDownTick
 
     // Countdown setup code calls displaytime which triggers event,
     // The event then fires once/ second afterwards
-    expect(emmisssions.length).toBe(1 + 5)
-    expect(emmisssions[0][0]).toMatchObject({'secondsLeft': 0, 'overTime': false})
-    expect(emmisssions[1][0]).toMatchObject({'secondsLeft': 59, 'overTime': false})
-    expect(emmisssions[2][0]).toMatchObject({'secondsLeft': 58, 'overTime': false})
-    expect(emmisssions[3][0]).toMatchObject({'secondsLeft': 57, 'overTime': false})
-    expect(emmisssions[4][0]).toMatchObject({'secondsLeft': 56, 'overTime': false})
-    expect(emmisssions[5][0]).toMatchObject({'secondsLeft': 55, 'overTime': false})
+    expect(emissions.length).toBe(1 + 5)
+    expect(emissions[0][0]).toMatchObject({'secondsLeft': 0, 'overTime': false})
+    expect(emissions[1][0]).toMatchObject({'secondsLeft': 59, 'overTime': false})
+    expect(emissions[2][0]).toMatchObject({'secondsLeft': 58, 'overTime': false})
+    expect(emissions[3][0]).toMatchObject({'secondsLeft': 57, 'overTime': false})
+    expect(emissions[4][0]).toMatchObject({'secondsLeft': 56, 'overTime': false})
+    expect(emissions[5][0]).toMatchObject({'secondsLeft': 55, 'overTime': false})
   })
 
   it('Emits an event when complete', function () {
@@ -223,8 +223,8 @@ describe('CountDown.vue', function () {
     wrapper.setProps(data)
 
     clock.tick(6000)
-    const emmisssions = wrapper.emitted().countDownComplete
+    const emissions = wrapper.emitted().countDownComplete
 
-    expect(emmisssions.length).toBe(1)
+    expect(emissions.length).toBe(1)
   })
 })

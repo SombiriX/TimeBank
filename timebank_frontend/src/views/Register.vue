@@ -207,7 +207,6 @@ export default {
     {
       submit: function () {
         // Validate inputs and login
-        console.log('[submit]', this)
         this.$v.$touch()
         if (!this.$v.$invalid) {
           let inputs = this.inputs
