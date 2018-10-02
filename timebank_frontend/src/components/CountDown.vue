@@ -14,6 +14,7 @@
 <script>
 // TODO handle pause unpause remaining time
 export default {
+  name: 'CountDown',
   props: {
     twentyFourClock: {
       type: Boolean,
@@ -80,6 +81,13 @@ export default {
           this._countUp()
         }
       }
+    },
+    twentyFourClock: function (value) {
+      if (value) {
+        this.dummy24Hr = true
+      } else {
+        this.dummy24Hr = false
+      }
     }
   },
   methods: {
@@ -109,8 +117,7 @@ export default {
 
         if (this.secondsLeft === 0) {
           // Countdown complete, display overage counter (count up)
-          // this.endTime = 0
-          // this.timeLeft = '00:00'
+
           this.$emit('countDownComplete')
           this.overTime = true
         }

@@ -19,14 +19,15 @@ export default {
     activationLoading: false,
     registrationCompleted: false,
     registrationError: false,
-    registrationLoading: false
+    registrationLoading: false,
+    errMsg: ''
   },
   actions: {
     createAccount ({ commit }, { username, password1, password2, email }) {
       commit(REGISTRATION_BEGIN)
       return api.createAccount(username, password1, password2, email)
         .then(() => commit(REGISTRATION_SUCCESS))
-        .catch(() => commit(REGISTRATION_FAILURE))
+        .catch(({ response }) => commit(REGISTRATION_FAILURE, response))
     },
     activateAccount ({ commit }, { key }) {
       commit(ACTIVATION_BEGIN)
@@ -67,9 +68,16 @@ export default {
       state.registrationError = false
       state.registrationLoading = false
     },
-    [REGISTRATION_FAILURE] (state) {
+    [REGISTRATION_FAILURE] (state, response) {
       state.registrationError = true
       state.registrationLoading = false
+      state.errMsg = ''
+      for (var key in response.data) {
+        state.errMsg += (
+          key.toUpperCase() + ', '
+        )
+      }
+      state.errMsg = state.errMsg.substr(0, state.errMsg.length - 2)
     },
     [REGISTRATION_SUCCESS] (state) {
       state.registrationCompleted = true

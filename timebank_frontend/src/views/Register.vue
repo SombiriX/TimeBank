@@ -58,7 +58,13 @@
             </v-text-field>
             <v-container grid-list-md text-xs-center>
               <v-layout row align-center justify-center>
-                <v-btn flat type='submit'>create account</v-btn>
+                <v-btn
+                  flat
+                  type='submit'
+                  ref="createAccBtn"
+                >
+                  create account
+                </v-btn>
               </v-layout>
               <v-layout row>
                 <v-flex xs4>
@@ -84,20 +90,6 @@
         </v-container>
       </v-card>
     </v-layout>
-    <v-snackbar
-    :color="alert.type"
-    v-model="alert.status"
-    multi-line
-    top
-    >
-     {{ alert.message }}
-      <v-btn
-        flat
-        @click="alert.status = false"
-      >
-        Close
-      </v-btn>
-    </v-snackbar>
   </div>
 </template>
 
@@ -117,12 +109,7 @@ export default {
         password2: '',
         email: ''
       },
-      pwd_visibility: false,
-      alert: {
-        status: false,
-        message: '',
-        type: 'info'
-      }
+      pwd_visibility: false
     }
   },
   validations: {
@@ -136,25 +123,20 @@ export default {
   watch: {
     registrationCompleted (val) {
       if (val) {
-        this.alert.status = true
-        this.alert.message = (
-          'Registration complete. You should receive an email shortly with\n' +
-          'instructions on how to activate your account.'
-        )
-        this.alert.type = 'success'
-      } else {
-        this.alert.status = false
-        this.alert.message = ''
+        const msg = 'Registration complete, check your email\n'
+        const type = 'success'
+        this.$emit('appAlert', { msg: msg, type: type })
+        this.clearRegistrationStatus()
       }
     },
     registrationError (val) {
       if (val) {
-        this.alert.status = true
-        this.alert.message = 'An error occurred while processing your request.'
-        this.alert.type = 'error'
-      } else {
-        this.alert.status = false
-        this.alert.message = ''
+        const msg = (
+          'An error occurred while processing your request: ' + this.errMsg
+        )
+        const type = 'error'
+        this.$emit('appAlert', { msg: msg, type: type })
+        this.clearRegistrationStatus()
       }
     }
   },
@@ -162,7 +144,8 @@ export default {
     mapState('signup', [
       'registrationCompleted',
       'registrationError',
-      'registrationLoading'
+      'registrationLoading',
+      'errMsg'
     ]),
     {
       usernameErrors () {
@@ -183,11 +166,15 @@ export default {
       },
       pass1Errors () {
         const errors = []
+        let confirmPass = this.inputs.password2
+        let otherPass = this.inputs.password1
         if (!this.$v.inputs.password1.$dirty) return errors
         !this.$v.inputs.password1.minLength && errors.push(
           'At least 8 characters required')
         !this.$v.inputs.password1.required && errors.push(
           'Password is required.')
+        !(confirmPass === otherPass) && errors.push(
+          'Passwords do not match')
         return errors
       },
       pass2Errors () {
