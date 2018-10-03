@@ -1,11 +1,8 @@
-from django.db.models import F
 from django.urls import reverse
-from django.utils import timezone
 from rest_framework import status
 from rest_framework.test import APIRequestFactory, APITestCase
 
 from timebank_app.models import User
-from timebank_app.serializers import UserSerializer
 
 
 class CurrentUserViewTest(APITestCase):
@@ -39,15 +36,7 @@ class CurrentUserViewTest(APITestCase):
     def test_get_user(self):
         test_pk = self.user.pk
         test_url = reverse('currentUser')
-        request = self.factory.get(test_url)
         response = self.client.get(test_url)
-        # get data from db
-        users = User.objects.all()
-        serializer = UserSerializer(
-            users,
-            context={'request': request},
-            many=True
-        )
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
