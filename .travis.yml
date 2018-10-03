@@ -13,6 +13,7 @@ matrix:
         - psql -c "CREATE USER timebank WITH PASSWORD 'DEBUG';" -U postgres
         - psql -c "ALTER USER timebank CREATEDB;" -U postgres
       script:
+        - pylint timebank_site/
         - python timebank_site/manage.py makemigrations
         - python timebank_site/manage.py migrate
         - python timebank_site/manage.py migrate --run-syncdb
