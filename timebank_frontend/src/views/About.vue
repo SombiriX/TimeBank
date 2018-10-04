@@ -5,10 +5,10 @@
         <div class="body-2 about_text">
           <span>Time Bank is a </span>
           <span class="confirm_selection">simple </span>
-          <span>way allocate and track time for specific tasks without the tedium of attempting to schedule every second of the day</span>        
+          <span>way allocate and track time for specific tasks without the tedium of attempting to schedule every second of the day</span>
         </div>
-      </v-flex>          
-    </v-layout>    
+      </v-flex>
+    </v-layout>
   </v-container>
 </template>
 
