@@ -31,6 +31,7 @@ class IntervalModelTest(TestCase):
         )
 
         self.interval = Interval.objects.create(
+            author=self.user,
             task=self.task
         )
 
@@ -64,6 +65,12 @@ class IntervalModelTest(TestCase):
             self.interval._meta.get_field('last_modified').verbose_name,
             'last modified'
             )
+    def test_author_label(self):
+        #pylint: disable=W0212
+        self.assertEqual(
+            self.interval._meta.get_field('author').verbose_name,
+            'author'
+        )
     def test__str__method(self):
         string_rep = self.interval.__str__()
         self.assertEqual(
