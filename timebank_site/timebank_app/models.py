@@ -69,6 +69,7 @@ class Interval(Model):
     )
     created = DateTimeField(auto_now_add=True)
     last_modified = DateTimeField(auto_now=True)
+    author = ForeignKey(User, related_name='intervals', on_delete=CASCADE)
 
     def __str__(self):
         return "{}: {} - {}".format(self.pk, self.start, self.stop)
