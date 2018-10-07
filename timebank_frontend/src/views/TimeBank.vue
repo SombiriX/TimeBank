@@ -170,7 +170,8 @@ export default {
     mapGetters('task', {
       taskRunning: 'taskRunning',
       completedTasks: 'completedTasks',
-      numCompleted: 'numCompleted'
+      numCompleted: 'numCompleted',
+      getTaskIdxById: 'getTaskIdxById'
     }),
     mapGetters('user', {
       userPrefs: 'userPrefs'
@@ -203,6 +204,10 @@ export default {
     },
     remove: function (id) {
       this.$store.dispatch('task/deleteTask', id)
+      const taskTxt = this.getTaskIdxById(id).task_name
+      const msg = 'Deleted: ' + taskTxt + '\n UNDO?\n'
+      const type = 'success'
+      this.$emit('appAlert', { msg: msg, type: type })
     },
     start: function (task) {
       if (!task.running || this.paused) {

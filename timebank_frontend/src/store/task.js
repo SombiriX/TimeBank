@@ -141,7 +141,7 @@ const mutations = {
     state.tasks.push(addFrontendFields(data))
   },
   [TASK_SET_TASKLIST] (state, data) {
-    state.tasks = addFrontendFields(data)
+    state.tasks = filterTasks(addFrontendFields(data))
   },
   [TASK_SET_STATE] (state) {
     const running = state.tasks.filter(task => task.running)
@@ -199,6 +199,17 @@ export default {
   getters,
   actions,
   mutations
+}
+
+function filterTasks (tasks) {
+  // Remove deleted tasks
+  if (Array.isArray(tasks)) {
+    // Filter task list
+    return tasks.filter(task => !task.deleted)
+  } else {
+    // filter single task
+    return tasks.deleted ? null : tasks
+  }
 }
 
 function addFrontendFields (tasks) {
