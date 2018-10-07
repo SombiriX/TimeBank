@@ -191,6 +191,7 @@ class TaskSerializerTest(TestCase):
             'author',
             'complete',
             'created',
+            'deleted',
             'id',
             'intervals',
             'last_added',
