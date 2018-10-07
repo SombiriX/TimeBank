@@ -12,8 +12,7 @@ import {
   TASK_NEW_INTERVAL,
   TASK_ADD_STOP_TIME,
   TASK_STOP,
-  TASK_PAUSE,
-  TASK_COMPLETE
+  TASK_PAUSE
 } from './types'
 
 const initialState = {
@@ -121,13 +120,14 @@ const actions = {
       .then(commit(TASK_STOP))
       .catch((err) => commit(TASK_FAIL, err))
   },
-  completeTask ({ actions, commit, getters, state }, taskId) {
-    // Update task's complete flag
-    if (state.running) {
-      actions.stopTask(taskId)
+  completeTask ({ dispatch, commit, getters, state }, taskId) {
+    // Update the task's complete flag
+    if (state.running && (state.runningTaskId === taskId)) {
+      // Stop the timer if task to complete is running
+      dispatch('stopTask', taskId)
     }
+
     let taskIdx = getters.getTaskIdxById(taskId)
-    commit(TASK_COMPLETE, taskIdx)
     return api.updateTask({ ...state.tasks[taskIdx] })
       .catch((err) => commit(TASK_FAIL, err))
   },
@@ -190,9 +190,6 @@ const mutations = {
   },
   [TASK_ADD_STOP_TIME] (state, stopTime) {
     state.interval.stop = stopTime
-  },
-  [TASK_COMPLETE] (state, taskIdx) {
-    state.tasks[taskIdx].complete = true
   },
   [TASK_STOP] (state) {
     state.running = false
