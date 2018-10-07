@@ -77,6 +77,12 @@ class TaskViewSet(ModelViewSet):
         serializer.save(author=self.request.user)
         return super(TaskViewSet, self).perform_create(serializer)
 
+    def perform_destroy(self, instance):
+        # Mark task as deleted without actually detroying data
+        # items marked for deletion will be deleted at a later time
+        instance.deleted = True
+        instance.save()
+
 
 class IntervalViewSet(ModelViewSet):
     queryset = Interval.objects.all()
