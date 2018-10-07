@@ -15,7 +15,7 @@ matrix:
       script:
         - pylint timebank_site/
         - python timebank_site/manage.py makemigrations
-        #- python timebank_site/manage.py migrate
+        - python timebank_site/manage.py migrate
         - python timebank_site/manage.py migrate --run-syncdb
         - python timebank_site/manage.py test timebank_app.tests
 

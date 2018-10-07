@@ -1,3 +1,5 @@
 # Ignore migrations
 # Different dev instances should makemigrations => migrate locally
-migrations/
+*.py
+!__init__.py
+
