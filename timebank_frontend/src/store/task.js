@@ -33,13 +33,23 @@ const initialState = {
 const getters = {
   taskRunning: state => !!state.running,
   completedTasks: (state) => {
-    return state.tasks.filter(task => task.complete)
+    return state.tasks.filter(task => (task.complete && !task.deleted))
+  },
+  deletedTasks: (state) => {
+    return state.tasks.filter(task => task.deleted)
+  },
+  tasks: (state) => {
+    return state.tasks.filter(task => !task.deleted)
   },
   numCompleted: (state, getters) => {
     return getters.completedTasks.length
   },
   getTaskIdxById: (state) => (id) => {
     return state.tasks.findIndex(task => task.id === id)
+  },
+  getTaskById: (state) => (id) => {
+    // Note: Returned value is read only
+    return state.tasks.find(task => task.id === id)
   },
   getTimeObj: (state) => (timeStr) => {
     return helpers.convertTimeString(timeStr)
@@ -120,6 +130,9 @@ const actions = {
     commit(TASK_COMPLETE, taskIdx)
     return api.updateTask({ ...state.tasks[taskIdx] })
       .catch((err) => commit(TASK_FAIL, err))
+  },
+  incrementTaskRuntime ({ commit, state }, increment) {
+    state.tasks[state.runningTaskIdx].runtime += increment
   }
 }
 
@@ -141,7 +154,7 @@ const mutations = {
     state.tasks.push(addFrontendFields(data))
   },
   [TASK_SET_TASKLIST] (state, data) {
-    state.tasks = filterTasks(addFrontendFields(data))
+    state.tasks = addFrontendFields(data)
   },
   [TASK_SET_STATE] (state) {
     const running = state.tasks.filter(task => task.running)
@@ -199,17 +212,6 @@ export default {
   getters,
   actions,
   mutations
-}
-
-function filterTasks (tasks) {
-  // Remove deleted tasks
-  if (Array.isArray(tasks)) {
-    // Filter task list
-    return tasks.filter(task => !task.deleted)
-  } else {
-    // filter single task
-    return tasks.deleted ? null : tasks
-  }
 }
 
 function addFrontendFields (tasks) {

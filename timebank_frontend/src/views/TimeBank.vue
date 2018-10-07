@@ -158,7 +158,6 @@ export default {
       'loading',
       'error',
       'errorMsg',
-      'tasks',
       'running',
       'runningTaskId',
       'runningTaskIdx',
@@ -171,7 +170,8 @@ export default {
       taskRunning: 'taskRunning',
       completedTasks: 'completedTasks',
       numCompleted: 'numCompleted',
-      getTaskIdxById: 'getTaskIdxById'
+      getTaskById: 'getTaskById',
+      tasks: 'tasks'
     }),
     mapGetters('user', {
       userPrefs: 'userPrefs'
@@ -203,9 +203,10 @@ export default {
       }
     },
     remove: function (id) {
+      // Mark the task for deletion and alert user of the action
       this.$store.dispatch('task/deleteTask', id)
-      const taskTxt = this.tasks[this.getTaskIdxById(id)].task_name
-      const msg = 'Deleted: ' + taskTxt + '\n UNDO?\n'
+      const taskTxt = this.getTaskById(id).task_name
+      const msg = 'Deleted: ' + taskTxt + ' UNDO?'
       const type = 'success'
       this.$emit('appAlert', { msg: msg, type: type })
     },
@@ -221,7 +222,7 @@ export default {
     handleCountdownTick: function (status) {
       if (this.running) {
         // Update displayed time on the running task
-        this.tasks[this.runningTaskIdx].runtime += 1
+        this.$store.dispatch('task/incrementTaskRuntime', 1)
       }
     },
     handleTaskComplete: function (task) {
