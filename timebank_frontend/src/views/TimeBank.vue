@@ -204,7 +204,7 @@ export default {
     },
     remove: function (id) {
       this.$store.dispatch('task/deleteTask', id)
-      const taskTxt = this.getTaskIdxById(id).task_name
+      const taskTxt = this.tasks[this.getTaskIdxById(id)].task_name
       const msg = 'Deleted: ' + taskTxt + '\n UNDO?\n'
       const type = 'success'
       this.$emit('appAlert', { msg: msg, type: type })
