@@ -40,6 +40,9 @@ const getters = {
   tasks: (state) => {
     return state.tasks.filter(task => !task.deleted)
   },
+  recurringTasks: (state) => {
+    return state.tasks.filter(task => task.task_type === 'C')
+  },
   numCompleted: (state, getters) => {
     return getters.completedTasks.length
   },
