@@ -110,7 +110,7 @@
               {{ displayTaskTime(task) }}
             <v-divider class="mx-2" inset vertical></v-divider>
             <div  v-if="task.active">
-              <v-btn flat icon @click="start(task)">
+              <v-btn v-if="!task.complete" flat icon @click="start(task)">
                 <v-icon v-if="!task.running || paused">play_arrow</v-icon>
                 <v-icon v-else>stop</v-icon>
               </v-btn>
