@@ -2,30 +2,39 @@
   <div>
     <v-layout row justify-center>
       <v-dialog v-model="dialog" max-width="400">
-        <v-card>
-          <v-container grid-list-xs>
-            <v-card-title class="headline">
-              {{ task_name }}
-            </v-card-title>
-          </v-container>
-          <v-card-actions>
-            <v-spacer></v-spacer>
-            <v-btn
-              color="success"
-              flat="flat"
-              @click.native="dialog = false, emitNo()"
-            >
-                NO
-            </v-btn>
-            <v-btn
-              color="error"
-              flat="flat"
-              @click.native="dialog = false, emitYes()"
-            >
-                YES
-            </v-btn>
-          </v-card-actions>
-        </v-card>
+        <v-form
+          ref="taskInfo"
+          v-model="taskInfoValid"
+          @submit.prevent="submit()"
+        >
+          <v-card>
+            <v-container grid-list-xs>
+              <v-text-field
+                autofocus
+                label="Task Name"
+                :rules=[rules.required]
+                v-model="task_name"
+              >
+              </v-text-field>
+              <v-text-field
+                label="Task Notes"
+                textarea
+                v-model="task_notes"
+              >
+              </v-text-field>
+            </v-container>
+            <v-card-actions>
+              <v-spacer></v-spacer>
+              <v-btn
+                color="accent"
+                flat="flat"
+                type="submit"
+              >
+                Update
+              </v-btn>
+            </v-card-actions>
+          </v-card>
+        </v-form>
       </v-dialog>
     </v-layout>
   </div>
@@ -115,9 +124,11 @@ export default {
   },
   data () {
     return {
+      taskName: null,
       risk_fields: [],
       loading: false,
       dialog: true,
+      taskInfoValid: false,
       rules: {
         required: value => !!value || 'Required.'
       }
@@ -129,13 +140,21 @@ export default {
     }
   },
   mounted: function () {
+    this.taskName = this.task_name
   },
   methods: {
-    emitYes: function () {
-      this.$emit('dialogYes')
+    updateTask: function () {
+      let taskData = {}
+      this.$emit('updateTask', taskData)
     },
     emitNo: function () {
       this.$emit('taskInfoClose')
+    },
+    submit: function () {
+      // Capture form submission
+      if (this.$refs.taskInfo.validate()) {
+        this.updateTask()
+      }
     }
   }
 }
