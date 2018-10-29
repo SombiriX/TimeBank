@@ -55,7 +55,10 @@ class TaskSerializer(ModelSerializer):
         if instance.running:
             most_recent_interval = Interval.objects.filter(
                 task__pk=instance.pk).order_by('-created')[0]
-            return IntervalSerializer(most_recent_interval).data
+            return IntervalSerializer(
+                most_recent_interval,
+                context={'request': self.context['request']}
+            ).data
 
         return None
 
@@ -116,23 +119,40 @@ class TaskSerializer(ModelSerializer):
 
 
 class IntervalSerializer(ModelSerializer):
+    author = HyperlinkedRelatedField(view_name='user-detail', read_only=True)
+
+    def get_validation_exclusions(self, *args, **kwargs):
+        # exclude the author field since it's supplied in view later
+        exclusions = super(
+            IntervalSerializer,
+            self
+        ).get_validation_exclusions(*args, **kwargs)
+        return exclusions + ['author']
 
     def validate(self, attrs):
         # Ensure stop time is after start time and
         # both start / stop times are in the past or present
-        i_start = attrs.get('start', None)
-        i_stop = attrs.get('stop', None)
-        has_stop = i_stop is not None
-
         right_now = timezone.now()
-        if not isinstance(i_start, timezone.datetime):
+
+        start = attrs.get('start', None)
+        stop = attrs.get('stop', None)
+        has_start = start is not None
+        has_stop = stop is not None
+        start_is_in_future = has_start and start > right_now
+        stop_is_in_future = has_stop and stop > right_now
+
+        if has_start and not isinstance(start, timezone.datetime):
             raise ValidationError('Invalid start value')
-        if has_stop and not isinstance(i_stop, timezone.datetime):
+        if has_stop and not isinstance(stop, timezone.datetime):
             raise ValidationError('Invalid stop value')
-        if has_stop and i_stop < i_start:
+        if has_stop and stop < start:
             raise ValidationError('Stop time should be after start time')
-        if i_start > right_now or (has_stop and i_stop > right_now):
+        if start_is_in_future or stop_is_in_future:
             raise ValidationError('Times should be in the past or present')
+
+        # Remove unsettable attribute values if provided
+        if 'author' in attrs.keys():
+            del attrs['author']
         return attrs
 
     class Meta:

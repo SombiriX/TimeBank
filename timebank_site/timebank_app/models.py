@@ -49,6 +49,7 @@ class Task(Model):
     )
     time_budget = IntegerField(default=0)
     complete = BooleanField(default=False)
+    deleted = BooleanField(default=False)
     running = BooleanField(default=False)
     created = DateTimeField(auto_now_add=True)
     last_added = DateTimeField(blank=True, null=True)
@@ -69,6 +70,7 @@ class Interval(Model):
     )
     created = DateTimeField(auto_now_add=True)
     last_modified = DateTimeField(auto_now=True)
+    author = ForeignKey(User, related_name='intervals', on_delete=CASCADE)
 
     def __str__(self):
         return "{}: {} - {}".format(self.pk, self.start, self.stop)

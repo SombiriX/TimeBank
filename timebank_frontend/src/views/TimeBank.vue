@@ -110,14 +110,18 @@
               {{ displayTaskTime(task) }}
             <v-divider class="mx-2" inset vertical></v-divider>
             <div  v-if="task.active">
-              <v-btn flat icon @click="start(task)">
+              <v-btn v-if="!task.complete" flat icon @click="start(task)">
                 <v-icon v-if="!task.running || paused">play_arrow</v-icon>
                 <v-icon v-else>stop</v-icon>
               </v-btn>
               <v-btn v-if="task.running" flat icon @click="pause(task)">
                 <v-icon>pause</v-icon>
               </v-btn>
-              <v-btn flat icon >
+              <v-btn
+                flat
+                icon
+                @click="currentTask=tasks[i], dialogOrNull('taskInfo')"
+              >
                 <v-icon>info_outline</v-icon>
               </v-btn>
               <v-btn flat icon @click="remove(task.id)">
@@ -128,13 +132,26 @@
         </template>
       </v-slide-y-transition>
     </v-card>
+    <!-- User Action Dialogs -->
+    <component
+      :is="taskInfoDialog"
+      v-bind="currentTask"
+      @taskInfoClose = "taskInfoClose()"
+    >
+    </component>
   </v-container>
 </template>
 
 <script>
 import countdown from '../components/CountDown'
+import taskInfo from '../components/taskInfo'
 import helpers from '../helpers'
 import { mapGetters, mapState } from 'vuex'
+import Vue from 'vue'
+
+Vue.component('taskInfo', {
+  template: taskInfo
+})
 
 export default {
   data: () => ({
@@ -150,7 +167,9 @@ export default {
       task_name: '',
       time_budget: ''
     },
-    taskValid: false
+    taskValid: false,
+    taskInfoDialog: null,
+    currentTask: {}
   }),
   components: { countdown },
   computed: Object.assign({},
@@ -158,7 +177,6 @@ export default {
       'loading',
       'error',
       'errorMsg',
-      'tasks',
       'running',
       'runningTaskId',
       'runningTaskIdx',
@@ -170,7 +188,9 @@ export default {
     mapGetters('task', {
       taskRunning: 'taskRunning',
       completedTasks: 'completedTasks',
-      numCompleted: 'numCompleted'
+      numCompleted: 'numCompleted',
+      getTaskById: 'getTaskById',
+      tasks: 'tasks'
     }),
     mapGetters('user', {
       userPrefs: 'userPrefs'
@@ -202,7 +222,12 @@ export default {
       }
     },
     remove: function (id) {
+      // Mark the task for deletion and alert user of the action
       this.$store.dispatch('task/deleteTask', id)
+      const taskTxt = this.getTaskById(id).task_name
+      const msg = 'Deleted: ' + taskTxt + ' UNDO?'
+      const type = 'success'
+      this.$emit('appAlert', { msg: msg, type: type })
     },
     start: function (task) {
       if (!task.running || this.paused) {
@@ -216,7 +241,7 @@ export default {
     handleCountdownTick: function (status) {
       if (this.running) {
         // Update displayed time on the running task
-        this.tasks[this.runningTaskIdx].runtime += 1
+        this.$store.dispatch('task/incrementTaskRuntime', 1)
       }
     },
     handleTaskComplete: function (task) {
@@ -247,6 +272,16 @@ export default {
       const overage = overtime ? '+ ' : ''
 
       return overage + newTime
+    },
+    dialogOrNull: function (dialog) {
+      if (dialog === 'taskInfo') {
+        this.taskInfoDialog = taskInfo
+      } else {
+        this.taskInfoDialog = null
+      }
+    },
+    taskInfoClose: function () {
+      this.taskInfoDialog = null
     }
   }
 }

@@ -77,6 +77,12 @@ class TaskViewSet(ModelViewSet):
         serializer.save(author=self.request.user)
         return super(TaskViewSet, self).perform_create(serializer)
 
+    def perform_destroy(self, instance):
+        # Mark task as deleted without actually detroying data
+        # items marked for deletion will be deleted at a later time
+        instance.deleted = True
+        instance.save()
+
 
 class IntervalViewSet(ModelViewSet):
     queryset = Interval.objects.all()
@@ -100,10 +106,10 @@ class IntervalViewSet(ModelViewSet):
         task = serializer.validated_data['task']
         task.running = True
         task.save()
+        serializer.save(author=self.request.user)
         return super(IntervalViewSet, self).perform_create(serializer)
 
     def perform_update(self, serializer):
-        # eg. raise ValidationError("Invalid dates")
         # Set the interval's task to stopped
         task = serializer.validated_data['task']
         task.running = False

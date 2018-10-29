@@ -12,8 +12,7 @@ import {
   TASK_NEW_INTERVAL,
   TASK_ADD_STOP_TIME,
   TASK_STOP,
-  TASK_PAUSE,
-  TASK_COMPLETE
+  TASK_PAUSE
 } from './types'
 
 const initialState = {
@@ -33,13 +32,26 @@ const initialState = {
 const getters = {
   taskRunning: state => !!state.running,
   completedTasks: (state) => {
-    return state.tasks.filter(task => task.complete)
+    return state.tasks.filter(task => (task.complete && !task.deleted))
+  },
+  deletedTasks: (state) => {
+    return state.tasks.filter(task => task.deleted)
+  },
+  tasks: (state) => {
+    return state.tasks.filter(task => !task.deleted)
+  },
+  recurringTasks: (state) => {
+    return state.tasks.filter(task => task.task_type === 'C')
   },
   numCompleted: (state, getters) => {
     return getters.completedTasks.length
   },
   getTaskIdxById: (state) => (id) => {
     return state.tasks.findIndex(task => task.id === id)
+  },
+  getTaskById: (state) => (id) => {
+    // Note: Returned value is read only
+    return state.tasks.find(task => task.id === id)
   },
   getTimeObj: (state) => (timeStr) => {
     return helpers.convertTimeString(timeStr)
@@ -111,15 +123,19 @@ const actions = {
       .then(commit(TASK_STOP))
       .catch((err) => commit(TASK_FAIL, err))
   },
-  completeTask ({ actions, commit, getters, state }, taskId) {
-    // Update task's complete flag
-    if (state.running) {
-      actions.stopTask(taskId)
+  completeTask ({ dispatch, commit, getters, state }, taskId) {
+    // Update the task's complete flag
+    if (state.running && (state.runningTaskId === taskId)) {
+      // Stop the timer if task to complete is running
+      dispatch('stopTask', taskId)
     }
+
     let taskIdx = getters.getTaskIdxById(taskId)
-    commit(TASK_COMPLETE, taskIdx)
     return api.updateTask({ ...state.tasks[taskIdx] })
       .catch((err) => commit(TASK_FAIL, err))
+  },
+  incrementTaskRuntime ({ commit, state }, increment) {
+    state.tasks[state.runningTaskIdx].runtime += increment
   }
 }
 
@@ -177,9 +193,6 @@ const mutations = {
   },
   [TASK_ADD_STOP_TIME] (state, stopTime) {
     state.interval.stop = stopTime
-  },
-  [TASK_COMPLETE] (state, taskIdx) {
-    state.tasks[taskIdx].complete = true
   },
   [TASK_STOP] (state) {
     state.running = false

@@ -268,7 +268,9 @@ class TaskViewSetTest(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
 
         response = self.client.get(test_url)
-        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        self.assertTrue(response.data.get('deleted', None))
 
 
 class IntervalViewSetTest(APITestCase):
@@ -308,10 +310,12 @@ class IntervalViewSetTest(APITestCase):
         )
 
         self.interval1 = Interval.objects.create(
+            author=self.user,
             task=self.task,
         )
 
         self.other_user_interval = Interval.objects.create(
+            author=self.other_user,
             task=self.other_user_task,
         )
 
@@ -521,7 +525,7 @@ class IntervalViewSetTest(APITestCase):
             data=self.valid_payload1
         )
 
-        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
 
     def test_update_other_user_interval(self):
         test_pk = self.other_user_interval.pk
@@ -554,7 +558,7 @@ class IntervalViewSetTest(APITestCase):
             test_url,
             data=self.invalid_payload1
         )
-        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_delete_interval(self):
         test_pk = self.interval1.pk
@@ -563,7 +567,7 @@ class IntervalViewSetTest(APITestCase):
         response = self.client.delete(
             test_url
         )
-        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
 
         test_pk = self.task.pk
         task_url = reverse('task-detail', kwargs={'pk': test_pk})

@@ -83,7 +83,10 @@ class IntervalSerializerTest(TestCase):
             'last_modified': '',
         }
 
-        self.interval = Interval.objects.create(**self.interval_attributes)
+        self.interval = Interval.objects.create(
+            **self.interval_attributes,
+            author=self.user
+        )
         self.request = self.factory.get('/some_path')
         self.serializer = IntervalSerializer(
             instance=self.interval,
@@ -94,6 +97,7 @@ class IntervalSerializerTest(TestCase):
         data = self.serializer.data
 
         field_names = [
+            'author',
             'created',
             'id',
             'last_modified',
@@ -102,6 +106,46 @@ class IntervalSerializerTest(TestCase):
             'task',
         ]
         self.assertCountEqual(data.keys(), field_names)
+
+    def test_author_field_content(self):
+        data = self.serializer.data
+        self.assertEqual(
+            type(data['author']),
+            Hyperlink
+        )
+
+    def test_start_field_content(self):
+        data = self.serializer.data
+        self.assertEqual(
+            data['start'],
+            self.interval_attributes['start']
+        )
+
+    def test_stop_field_content(self):
+        data = self.serializer.data
+        self.assertEqual(
+            data['stop'],
+            self.interval_attributes['stop']
+        )
+
+    def test_created_field_content(self):
+        data = self.serializer.data
+        self.assertEqual(
+            type(data['created']),
+            str
+        )
+    def test_last_modified_field_content(self):
+        data = self.serializer.data
+        self.assertEqual(
+            type(data['last_modified']),
+            str
+        )
+    def test_task_field_content(self):
+        data = self.serializer.data
+        self.assertEqual(
+            data['task'],
+            self.interval_attributes['task'].id
+        )
 
 
 class TaskSerializerTest(TestCase):
@@ -147,6 +191,7 @@ class TaskSerializerTest(TestCase):
             'author',
             'complete',
             'created',
+            'deleted',
             'id',
             'intervals',
             'last_added',
@@ -254,11 +299,13 @@ class TaskSerializerTest(TestCase):
         fifteen_mins_ago = right_now - timezone.timedelta(minutes=15)
 
         interval1 = Interval.objects.create(
+            author=self.user,
             task=running_task,
             start=an_hour_ago,
             stop=thirty_mins_ago
         )
         interval2 = Interval.objects.create(
+            author=self.user,
             task=running_task,
             start=fifteen_mins_ago
         )
@@ -279,8 +326,12 @@ class TaskSerializerTest(TestCase):
         )
 
         # Verify the running interval
-        i1 = IntervalSerializer(instance=interval1)
-        i2 = IntervalSerializer(instance=interval2)
+        i1 = IntervalSerializer(
+            instance=interval1, context={'request': self.request}
+        )
+        i2 = IntervalSerializer(
+            instance=interval2, context={'request': self.request}
+        )
         self.assertEqual(
             data2['running_interval'],
             i2.data
