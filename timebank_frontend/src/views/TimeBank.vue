@@ -250,7 +250,6 @@ export default {
       this.$store.dispatch('task/completeTask', task.id)
     },
     handleUpdateTask: function (taskData) {
-      console.log('taskData', taskData)
       // Call vuex updateTask action
       this.$store.dispatch('task/updateTask', taskData)
     },

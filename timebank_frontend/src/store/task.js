@@ -12,7 +12,8 @@ import {
   TASK_NEW_INTERVAL,
   TASK_ADD_STOP_TIME,
   TASK_STOP,
-  TASK_PAUSE
+  TASK_PAUSE,
+  TASK_UPDATE
 } from './types'
 
 const initialState = {
@@ -134,8 +135,10 @@ const actions = {
     return api.updateTask({ ...state.tasks[taskIdx] })
       .catch((err) => commit(TASK_FAIL, err))
   },
-  updateTask ({ commit }, taskData) {
+  updateTask ({ commit, getters }, taskData) {
+    let taskIdx = { idx: getters.getTaskIdxById(taskData.id) }
     return api.updateTask({ ...taskData })
+      .then(commit(TASK_UPDATE, { ...taskIdx, ...taskData }))
       .catch((err) => commit(TASK_FAIL, err))
   },
   incrementTaskRuntime ({ commit, state }, increment) {
@@ -207,6 +210,10 @@ const mutations = {
   },
   [TASK_PAUSE] (state) {
     state.paused = true
+  },
+  [TASK_UPDATE] (state, data) {
+    state.tasks[data.idx].task_name = data.task_name
+    state.tasks[data.idx].task_notes = data.task_notes
   }
 }
 
