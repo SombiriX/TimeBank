@@ -134,6 +134,10 @@ const actions = {
     return api.updateTask({ ...state.tasks[taskIdx] })
       .catch((err) => commit(TASK_FAIL, err))
   },
+  updateTask ({ commit }, taskData) {
+    return api.updateTask({ ...taskData })
+      .catch((err) => commit(TASK_FAIL, err))
+  },
   incrementTaskRuntime ({ commit, state }, increment) {
     state.tasks[state.runningTaskIdx].runtime += increment
   }

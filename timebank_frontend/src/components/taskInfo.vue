@@ -11,17 +11,18 @@
             <v-container grid-list-xs>
               <v-text-field
                 autofocus
+                outline
                 label="Task Name"
                 :rules=[rules.required]
-                v-model="task_name"
+                v-model="task.task_name"
               >
               </v-text-field>
-              <v-text-field
+              <v-textarea
+                outline
                 label="Task Notes"
-                textarea
-                v-model="task_notes"
+                v-model="task.task_notes"
               >
-              </v-text-field>
+              </v-textarea>
             </v-container>
             <v-card-actions>
               <v-spacer></v-spacer>
@@ -131,6 +132,25 @@ export default {
       taskInfoValid: false,
       rules: {
         required: value => !!value || 'Required.'
+      },
+      task: {
+        id: this.id,
+        author: this.author,
+        intervals: this.intervals,
+        running_interval: this.running_interval,
+        runtime: this.runtime,
+        task_name: this.task_name,
+        task_notes: this.task_notes,
+        task_type: this.task_type,
+        time_budget: this.time_budget,
+        complete: this.complete,
+        deleted: this.deleted,
+        running: this.running,
+        created: this.created,
+        last_added: this.last_added,
+        last_modified: this.last_modified,
+        parent_task: this.parent_task,
+        tasklist: this.tasklist.slice(0) // Array does not store objects
       }
     }
   },
@@ -144,8 +164,7 @@ export default {
   },
   methods: {
     updateTask: function () {
-      let taskData = {}
-      this.$emit('updateTask', taskData)
+      this.$emit('updateTask', this.task)
     },
     emitNo: function () {
       this.$emit('taskInfoClose')
