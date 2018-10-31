@@ -136,7 +136,8 @@
     <component
       :is="taskInfoDialog"
       v-bind="currentTask"
-      @taskInfoClose = "taskInfoClose()"
+      @taskInfoClose="taskInfoClose()"
+      @updateTask="handleUpdateTask"
     >
     </component>
   </v-container>
@@ -247,6 +248,10 @@ export default {
     handleTaskComplete: function (task) {
       // Call vuex completeTask action
       this.$store.dispatch('task/completeTask', task.id)
+    },
+    handleUpdateTask: function (taskData) {
+      // Call vuex updateTask action
+      this.$store.dispatch('task/updateTask', taskData)
     },
     pause: function (task) {
       this.$store.dispatch('task/pauseTask', task.id)
