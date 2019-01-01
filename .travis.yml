@@ -8,6 +8,7 @@ matrix:
         - postgresql
       install:
         - pip install -r requirements.txt
+        - pip install coverage
       before_script:
         - psql -c 'create database timebank_app;' -U postgres
         - psql -c "CREATE USER timebank WITH PASSWORD 'DEBUG';" -U postgres
@@ -17,7 +18,8 @@ matrix:
         - python timebank_site/manage.py makemigrations
         - python timebank_site/manage.py migrate
         - python timebank_site/manage.py migrate --run-syncdb
-        - python timebank_site/manage.py test timebank_app.tests
+        - coverage run timebank_site/manage.py test timebank_app.tests
+        - coverage report --omit="*site-packages*"
 
     - language: node_js
       node_js:
