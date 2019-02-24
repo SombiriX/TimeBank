@@ -169,7 +169,7 @@ describe('Register.vue', () => {
     expect(actions.clearRegistrationStatus).toHaveBeenCalled()
   })
 
-  test('Does not attempt submition with invalid password length', () => {
+  test('Does not attempt submission with invalid password length', () => {
     // Set valid data
     wrapper.setData({
       inputs: {
@@ -200,7 +200,7 @@ describe('Register.vue', () => {
     expect(actions.clearRegistrationStatus).not.toHaveBeenCalled()
   })
 
-  test('Does not attempt submition with non-matching password1', () => {
+  test('Does not attempt submission with non-matching password1', () => {
     // Set valid data
     wrapper.setData({
       inputs: {
@@ -234,7 +234,7 @@ describe('Register.vue', () => {
     // expect(actions.clearRegistrationStatus).not.toHaveBeenCalled()
   })
 
-  test('Does not attempt submition with non-matching password2', () => {
+  test('Does not attempt submission with non-matching password2', () => {
     // Set valid data
     wrapper.setData({
       inputs: {
@@ -268,7 +268,7 @@ describe('Register.vue', () => {
     // expect(actions.clearRegistrationStatus).not.toHaveBeenCalled()
   })
 
-  test('Does not attempt submition with bad email input', () => {
+  test('Does not attempt submission with bad email input', () => {
     // Set valid data
     wrapper.setData({
       inputs: {
