@@ -3,7 +3,7 @@
 
 *** Settings ***
 Documentation   Tests Timebank end to end
-Resource        timebank_site/timebank_app/tests/resources/common.robot    # Test setup and teardown
+Resource        resources/common.robot    # common test vars, keywords, etc
 Test Teardown   Clear DB
 
 *** Keywords ***
