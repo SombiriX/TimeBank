@@ -2,14 +2,29 @@ matrix:
   include:
     - language: python
       python: 3.6
+      dist: xenial
+      sudo: required
+      addons:
+        apt:
+          sources:
+            - google-chrome
+          packages:
+            - google-chrome-stable
       addons:
         postgresql: "9.5"
+      before_install:
+        - sudo apt-get install -y xvfb
       services:
         - postgresql
       install:
         - pip install -r requirements.txt
-        - pip install coverage
+        - pip install coverage robotframework-djangolibrary
       before_script:
+        - wget "http://chromedriver.storage.googleapis.com/2.35/chromedriver_linux64.zip"
+        - unzip chromedriver_linux64.zip
+        - sudo mv chromedriver /usr/local/bin
+        - "export DISPLAY=:99.0"
+        - Xvfb :99 -screen 0 1024x768x24 > /dev/null 2>&1 &
         - psql -c 'create database timebank_app;' -U postgres
         - psql -c "CREATE USER timebank WITH PASSWORD 'DEBUG';" -U postgres
         - psql -c "ALTER USER timebank CREATEDB;" -U postgres
@@ -20,6 +35,7 @@ matrix:
         - python timebank_site/manage.py migrate --run-syncdb
         - coverage run timebank_site/manage.py test timebank_app.tests
         - coverage report --omit="*site-packages*","*tests*" --skip-covered
+        - robot timebank_site/timebank_app/tests/
 
     - language: node_js
       node_js:
