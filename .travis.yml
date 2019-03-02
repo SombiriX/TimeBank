@@ -11,6 +11,7 @@ matrix:
             - google-chrome
           packages:
             - google-chrome-stable
+            - chromium-chromedriver
       addons:
         postgresql: "9.5"
       before_install:
@@ -21,6 +22,7 @@ matrix:
         - pip install -r requirements.txt
         - pip install coverage robotframework-djangolibrary
       before_script:
+        - ln -s /usr/lib/chromium-browser/chromedriver /usr/bin/chromedriver
         - sh -e /etc/init.d/xvfb start
         - sleep 3
         - psql -c 'create database timebank_app;' -U postgres
