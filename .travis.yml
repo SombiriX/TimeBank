@@ -2,8 +2,9 @@ matrix:
   include:
     - language: python
       python: 3.6
-      dist: xenial
+      dist: trusty
       sudo: required
+      env: DISPLAY=':99.0'
       addons:
         apt:
           sources:
@@ -20,11 +21,8 @@ matrix:
         - pip install -r requirements.txt
         - pip install coverage robotframework-djangolibrary
       before_script:
-        - wget "http://chromedriver.storage.googleapis.com/2.35/chromedriver_linux64.zip"
-        - unzip chromedriver_linux64.zip
-        - sudo mv chromedriver /usr/local/bin
-        - "export DISPLAY=:99.0"
-        - Xvfb :99 -screen 0 1024x768x24 > /dev/null 2>&1 &
+        - sh -e /etc/init.d/xvfb start
+        - sleep 3
         - psql -c 'create database timebank_app;' -U postgres
         - psql -c "CREATE USER timebank WITH PASSWORD 'DEBUG';" -U postgres
         - psql -c "ALTER USER timebank CREATEDB;" -U postgres

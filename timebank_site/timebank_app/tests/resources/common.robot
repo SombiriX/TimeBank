@@ -1,8 +1,9 @@
 *** Variables ***
-${HOSTNAME}             127.0.0.1
-${PORT}                 55001
-${SERVER}               http://${HOSTNAME}:${PORT}/
-${BROWSER}              chrome
+${HOSTNAME}     127.0.0.1
+${PORT}         55001
+${SERVER}       http://${HOSTNAME}:${PORT}/
+${BROWSER}      chrome
+${SANDBOX}      --verbose
 
 *** Settings ***
 Documentation   Django Robot Tests
@@ -13,7 +14,7 @@ Library         DjangoLibrary  ${HOSTNAME}  ${PORT}  path=timebank_site/timebank
 Start Django and open Browser
   Start Django
   # Open Browser  ${SERVER}  ${BROWSER}
-  ${list} =     Create List    --no-sandbox
+  ${list} =     Create List    ${SANDBOX}
   ${args} =     Create Dictionary    args=${list}
   ${desired caps} =     Create Dictionary    chromeOptions=${args}
   Open Browser    ${SERVER}    browser=${BROWSER}    desired_capabilities=${desired caps}
