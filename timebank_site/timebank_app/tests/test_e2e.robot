@@ -5,6 +5,8 @@
 Documentation   Tests Timebank end to end
 Resource        resources/common.robot    # common test vars, keywords, etc
 Test Teardown   Clear DB
+Suite Setup     Start Django and open Browser
+Suite Teardown  Stop Django and close Browser
 
 *** Keywords ***
 
