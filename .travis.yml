@@ -35,7 +35,7 @@ matrix:
         - python timebank_site/manage.py migrate --run-syncdb
         - coverage run timebank_site/manage.py test timebank_app.tests
         - coverage report --omit="*site-packages*","*tests*" --skip-covered
-        - robot timebank_site/timebank_app/tests/
+        - robot --variable BROWSER:headlesschrome timebank_site/timebank_app/tests/
 
     - language: node_js
       node_js:
