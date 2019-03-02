@@ -32,6 +32,7 @@ matrix:
         - coverage run timebank_site/manage.py test timebank_app.tests
         - coverage report --omit="*site-packages*","*tests*" --skip-covered
         - robot --variable BROWSER:headlesschrome --variable SANDBOX:--no-sandbox timebank_site/timebank_app/tests/
+        - cat /home/travis/build/SombiriX/TimeBank/log.html
 
     - language: node_js
       node_js:
