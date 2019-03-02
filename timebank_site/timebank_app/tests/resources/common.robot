@@ -12,7 +12,11 @@ Library         DjangoLibrary  ${HOSTNAME}  ${PORT}  path=timebank_site/timebank
 *** Keywords ***
 Start Django and open Browser
   Start Django
-  Open Browser  ${SERVER}  ${BROWSER}
+  # Open Browser  ${SERVER}  ${BROWSER}
+  ${list} =     Create List    --no-sandbox
+  ${args} =     Create Dictionary    args=${list}
+  ${desired caps} =     Create Dictionary    chromeOptions=${args}
+  Open Browser    ${SERVER}    browser=${BROWSER}    desired_capabilities=${desired caps}
 
 Stop Django and close browser
   Close Browser
