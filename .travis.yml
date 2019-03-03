@@ -29,6 +29,7 @@ matrix:
         - python timebank_site/manage.py migrate --run-syncdb
         - coverage run timebank_site/manage.py test timebank_app.tests
         - coverage report --omit="*site-packages*","*tests*" --skip-covered
+        - python timebank_site/manage.py runserver 0:8000
         - robot --variable BROWSER:headlesschrome --variable SANDBOX:--no-sandbox timebank_site/timebank_app/tests/
         - cat /home/travis/build/SombiriX/TimeBank/log.html
         - cat selenium-screenshot-1.png | base64
