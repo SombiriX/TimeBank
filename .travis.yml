@@ -22,6 +22,8 @@ matrix:
         - psql -c 'create database timebank_app;' -U postgres
         - psql -c "CREATE USER timebank WITH PASSWORD 'DEBUG';" -U postgres
         - psql -c "ALTER USER timebank CREATEDB;" -U postgres
+        - sudo chown -R travis .
+        - ls -lh
       script:
         - pylint timebank_site/
         - python timebank_site/manage.py makemigrations
@@ -32,7 +34,6 @@ matrix:
         - robot --variable BROWSER:headlesschrome --variable SANDBOX:--no-sandbox timebank_site/timebank_app/tests/
         - cat /home/travis/build/SombiriX/TimeBank/log.html
         - cat selenium-screenshot-1.png | base64
-        - whoami
 
     # - language: node_js
     #   node_js:
