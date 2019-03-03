@@ -1,6 +1,6 @@
 *** Variables ***
 ${HOSTNAME}     127.0.0.1
-${PORT}         55001
+${PORT}         8000
 ${SERVER}       http://${HOSTNAME}:${PORT}/
 ${BROWSER}      chrome
 ${SANDBOX}      --verbose

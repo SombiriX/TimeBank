@@ -22,8 +22,6 @@ matrix:
         - psql -c 'create database timebank_app;' -U postgres
         - psql -c "CREATE USER timebank WITH PASSWORD 'DEBUG';" -U postgres
         - psql -c "ALTER USER timebank CREATEDB;" -U postgres
-        - sudo chown -R travis .
-        - ls -lh
       script:
         - pylint timebank_site/
         - python timebank_site/manage.py makemigrations
