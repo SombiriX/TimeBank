@@ -23,6 +23,7 @@ matrix:
         - pip install coverage robotframework-djangolibrary
         - cd timebank_frontend
         - npm install
+        - npm run build
         - cd ..
       before_script:
         - sudo ln -s /usr/lib/chromium-browser/chromedriver /usr/bin/chromedriver
