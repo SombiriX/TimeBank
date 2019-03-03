@@ -8,7 +8,7 @@ ${SANDBOX}      --verbose
 *** Settings ***
 Documentation   Django Robot Tests
 Library         SeleniumLibrary  timeout=10  implicit_wait=0
-Library         DjangoLibrary  ${HOSTNAME}  ${PORT}  path=timebank_site/timebank_site  manage=timebank_site/manage.py  settings=timebank_site.settings
+Library         DjangoLibrary  ${HOSTNAME}  ${PORT}  path=timebank_site/timebank_app  manage=timebank_site/manage.py  settings=timebank_site.settings
 
 *** Keywords ***
 Start Django and open Browser
