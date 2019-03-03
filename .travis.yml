@@ -11,8 +11,6 @@ matrix:
         apt:
           packages:
             - chromium-chromedriver
-      before_install:
-        - sudo apt-get install -y xvfb
       services:
         - postgresql
       install:
@@ -24,6 +22,7 @@ matrix:
         - psql -c 'create database timebank_app;' -U postgres
         - psql -c "CREATE USER timebank WITH PASSWORD 'DEBUG';" -U postgres
         - psql -c "ALTER USER timebank CREATEDB;" -U postgres
+        - sudo chmod 777 -R .
       script:
         - pylint timebank_site/
         - python timebank_site/manage.py makemigrations
@@ -35,20 +34,20 @@ matrix:
         - cat /home/travis/build/SombiriX/TimeBank/log.html
         - cat selenium-screenshot-1.png | base64
 
-    - language: node_js
-      node_js:
-        - "node"
-      before_install:
-        -  cd timebank_frontend
-      cache:
-        directories:
-          - "node_modules"
-      install:
-        - npm install
-      script:
-        - npm run test:unit
-        # - npm run test:e2e
-        # - npm run build
+    # - language: node_js
+    #   node_js:
+    #     - "node"
+    #   before_install:
+    #     -  cd timebank_frontend
+    #   cache:
+    #     directories:
+    #       - "node_modules"
+    #   install:
+    #     - npm install
+    #   script:
+    #     - npm run test:unit
+    #     # - npm run test:e2e
+    #     # - npm run build
 
 notifications:
   email:
