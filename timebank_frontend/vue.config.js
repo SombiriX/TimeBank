@@ -6,6 +6,8 @@ const WriteFilePlugin = require('write-file-webpack-plugin')
 const os = require('os')
 const ifaces = os.networkInterfaces()
 
+console.log('BaseUrl: ', config.get("baseUrl"))
+
 function getHostIp () {
   Object.keys(ifaces).forEach(function (ifname) {
     let alias = 0
