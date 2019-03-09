@@ -27,7 +27,7 @@ matrix:
         - npm run build
         - cd ..
       before_script:
-        - sudo ln -s /usr/lib/chromium-browser/chromedriver /usr/bin/chromedriver
+        - if [ -f /usr/bin/chromedriver ]; then echo "Chromedriver exists, yay"; else sudo ln -s /usr/lib/chromium-browser/chromedriver /usr/bin/chromedriver; echo "Created symlink for chromedriver";fi
         - sleep 3
         - psql -c 'create database timebank_app;' -U postgres
         - psql -c "CREATE USER timebank WITH PASSWORD 'DEBUG';" -U postgres
