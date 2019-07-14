@@ -3,13 +3,8 @@ ${USERNAME}         TEST_USER
 ${USERNAME2}        TEST_USER2
 ${PASSWD}           qweasdzx
 ${EMAIL}            test@example.com
-${EMAIL2}            test2@example.com
+${EMAIL2}           test2@example.com
 ${SUBMIT}           xpath:.//button[@type='submit']
-${BASE APP}         id:app
-# Toolbar
-${LOGIN BTN}        xpath:.//a[@href='/login']
-${CREATE BTN}       xpath:.//a[@href='/register']
-${TIMEBANK BTN}     xpath:.//a[@href='/timebank']
 # Login
 ${LOGIN VIEW}       id:login-view
 ${LOGIN URL}        ${SERVER}/login
