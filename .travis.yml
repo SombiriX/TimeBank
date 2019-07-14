@@ -2,14 +2,33 @@ matrix:
   include:
     - language: python
       python: 3.6
+      node_js:
+        - "node"
+      dist: xenial
+      sudo: required
+      env: DISPLAY=':99.0'
+      cache:
+        directories:
+          - "node_modules"
       addons:
         postgresql: "9.5"
+        chrome: stable
+        apt:
+          packages:
+            - chromium-chromedriver
       services:
         - postgresql
       install:
         - pip install -r requirements.txt
-        - pip install coverage
+        - pip install coverage robotframework-djangolibrary
+        - cd timebank_frontend
+        - npm install
+        - export NODE_ENV=test
+        - npm run build
+        - cd ..
       before_script:
+        - if [ -f /usr/bin/chromedriver ]; then echo "Chromedriver exists, yay"; else sudo ln -s /usr/lib/chromium-browser/chromedriver /usr/bin/chromedriver; echo "Created symlink for chromedriver";fi
+        - sleep 3
         - psql -c 'create database timebank_app;' -U postgres
         - psql -c "CREATE USER timebank WITH PASSWORD 'DEBUG';" -U postgres
         - psql -c "ALTER USER timebank CREATEDB;" -U postgres
@@ -20,22 +39,6 @@ matrix:
         - python timebank_site/manage.py migrate --run-syncdb
         - coverage run timebank_site/manage.py test timebank_app.tests
         - coverage report --omit="*site-packages*","*tests*" --skip-covered
-
-    - language: node_js
-      node_js:
-        - "node"
-      before_install:
-        -  cd timebank_frontend
-      cache:
-        directories:
-          - "node_modules"
-      install:
-        - npm install
-      script:
-        - npm run test:unit
-        # - npm run test:e2e
-        # - npm run build
-
-notifications:
-  email:
-    - email@example.com
+        - robot --variable BROWSER:headlesschrome --variable SANDBOX:--no-sandbox timebank_site/timebank_app/tests/
+        - cat /home/travis/build/SombiriX/TimeBank/log.html
+        - cat selenium-screenshot-1.png | base64

@@ -109,3 +109,8 @@ venv.bak/
 # Apple Stuff
 .DS_Store
 
+# Robot Output
+log.html
+report.html
+output.xml
+*.png
